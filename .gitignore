@@ -1,0 +1,53 @@
+# Configuration for Git Ignore, excluding specific paths.
+# For more details on available options, refer to: https://git-scm.com
+
+# Build system artifacts and CMake-generated files
+/build/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+CTestTestfile.cmake
+_CPack_Packages/
+
+# Rust compilation outputs and dependency artifacts
+target/
+
+# Common object files and compiled binary formats
+*.o
+*.obj
+*.lo
+*.la
+*.lai
+*.al
+*.libs
+*.so
+*.so.[0-9]*
+*.a
+*.lib
+*.dll
+*.dSYM/
+*.pdb
+*.exe
+*.out
+a.out
+
+# Editor-specific configurations and IDE temporary files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Runtime logs, backups, and temporary system files
+*.log
+*.tmp
+*.temp
+temp/
+tmp/
+*.bak
+
+# Local environment configurations and tool-specific metadata
+# Excludes all files ending in .local to prevent environment leaks
+*.local

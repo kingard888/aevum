@@ -1,0 +1,62 @@
+# Configuration for clang-format, enforcing a consistent C++ coding style.
+# For more details on available options, refer to: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
+# Start with Google's style as a base, as it is widely adopted and provides a robust foundation.
+BasedOnStyle: Google
+
+# Set the number of spaces to use for indentation.
+# While Google's default is 2, 4 spaces are very common and often preferred in C++ projects.
+IndentWidth: 4
+# Set the number of spaces that a tab character is equal to. Should match IndentWidth.
+TabWidth: 4
+# Use spaces instead of tab characters for all indentation.
+UseTab: Never
+# Maximum line length for clang-format to try and adhere to.
+ColumnLimit: 100
+
+# Defines the positioning of opening braces.
+# 'Attach' places opening braces on the same line as the control statement (e.g., if (cond) {).
+# Other common options include Allman, Stroustrup, Mozilla.
+BreakBeforeBraces: Attach
+
+# Offset for access modifiers (public:, private:, protected:).
+# A value of -2 aligns them with the class keyword.
+AccessModifierOffset: -2
+
+# Position of the '*' for pointers and '&' for references.
+# 'Right' aligns the asterisk/ampersand with the variable name (e.g., int *ptr;).
+# Other options: Left (int* ptr;), Middle (int * ptr;).
+PointerAlignment: Right
+
+# Control whether the content inside a namespace should be indented.
+# 'None' means no indentation inside namespaces, which is a common practice to avoid excessive nesting.
+NamespaceIndentation: None
+
+# Sort #include directives alphabetically within each group.
+SortIncludes: true
+# Group #include directives into logical blocks (e.g., system headers, then project headers).
+IncludeBlocks: Regroup
+# Define the order and priority for different groups of includes.
+IncludeCategories:
+  - Regex: '^<.*>$' # System includes (e.g., <iostream>)
+    Priority: 1
+    SortPriority: 0 # Highest sort priority (comes first)
+  - Regex: '^"(?!google|gtest|gmock).*"' # Project-specific includes (e.g., "my_header.hpp"), excluding Google test frameworks if they were local
+    Priority: 2
+    SortPriority: 1
+  - Regex: '.*' # Any other includes not caught by the above rules
+    Priority: 3
+    SortPriority: 2 # Lowest sort priority (comes last)
+
+# Whether to break parameters onto new lines if they don't fit on a single line.
+BinPackParameters: true
+
+# Align trailing comments to a common column.
+AlignTrailingComments: true
+# Allow short lambda expressions to be placed on a single line if they are empty.
+AllowShortLambdasOnASingleLine: Empty
+
+# Add a space before opening parentheses for control flow statements (if, while, for, etc.).
+SpaceBeforeParens: ControlStatements
+# Add spaces between template keyword and angle brackets (e.g., template <typename T>).
+SpaceAfterTemplateKeyword: Yes

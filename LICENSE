@@ -1,0 +1,91 @@
+                       AEVUMDB COMMUNITY LICENSE
+                       Version 1.0, March 2026
+
+                 Copyright (c) 2026 Ananda Firmansyah.
+      Official Organization: AevumDB (https://github.com/aevumdb)
+
+     TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. DEFINITIONS
+
+   "Licensor" shall mean Ananda Firmansyah, the copyright owner and the 
+   authorized entity of the AevumDB organization.
+
+   "Software" shall mean the AevumDB database engine, including but not 
+   limited to source code, object code, documentation, binary files, and 
+   configuration files managed within the AevumDB organization repositories.
+
+   "You" (or "Your") shall mean an individual or Legal Entity exercising 
+   permissions granted by this License.
+
+   "Contribution" shall mean any work of authorship, including the original 
+   version of the Software and any modifications or additions to that 
+   Software, submitted to Licensor for inclusion in the Software.
+
+2. GRANT OF COPYRIGHT LICENSE
+
+   Subject to the terms and conditions of this License, Licensor hereby 
+   grants You a perpetual, worldwide, non-exclusive, no-charge, 
+   royalty-free, and irrevocable copyright license to reproduce, prepare 
+   Derivative Works of, publicly display, publicly perform, sublicense, 
+   and distribute the Software and such Derivative Works in source or 
+   object form.
+
+3. GRANT OF PATENT LICENSE
+
+   Subject to the terms and conditions of this License, Licensor hereby 
+   grants You a perpetual, worldwide, non-exclusive, no-charge, 
+   royalty-free, and irrevocable (except as stated in this section) 
+   patent license to make, have made, use, offer to sell, sell, import, 
+   and otherwise transfer the Software. This license applies only to 
+   those patent claims licensable by Licensor that are necessarily 
+   infringed by their Contribution(s) alone or by combination of their 
+   Contribution(s) with the Software.
+
+4. ATTRIBUTION AND RETENTION
+
+   Any redistribution of the Software or Derivative Works must comply 
+   with the following:
+   
+   (a) You must give any other recipients of the Software or Derivative 
+       Works a copy of this License; and
+   (b) You must retain, in the Source form of any Derivative Works that 
+       You distribute, all copyright, patent, trademark, and attribution 
+       notices from the Source form of the Software, excluding those 
+       notices that do not pertain to any part of the Derivative Works.
+
+5. TRADEMARKS
+
+   This License does not grant permission to use the trade names, 
+   trademarks, service marks, or product names of the Licensor, 
+   specifically "AevumDB," except as required for accurate and customary 
+   description of the origin of the Software and reproduction of the 
+   content of the NOTICE file.
+
+6. TERMINATION
+
+   This License and the rights granted hereunder will terminate 
+   automatically if You fail to comply with any of its terms. 
+   Furthermore, if You institute patent litigation against any entity 
+   alleging that the Software constitutes direct or contributory patent 
+   infringement, then any patent licenses granted to You under this 
+   License shall terminate as of the date such litigation is filed.
+
+7. DISCLAIMER OF WARRANTY
+
+   UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING, LICENSOR 
+   PROVIDES THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER 
+   EXPRESS OR IMPLIED, INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR 
+   CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR 
+   A PARTICULAR PURPOSE.
+
+8. LIMITATION OF LIABILITY
+
+   IN NO EVENT AND UNDER NO LEGAL THEORY, WHETHER IN TORT (INCLUDING 
+   NEGLIGENCE), CONTRACT, OR OTHERWISE, SHALL LICENSOR BE LIABLE TO YOU 
+   FOR DAMAGES, INCLUDING ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR 
+   CONSEQUENTIAL DAMAGES ARISING AS A RESULT OF THIS LICENSE OR OUT OF 
+   THE USE OR INABILITY TO USE THE SOFTWARE.
+
+                END OF AEVUMDB COMMUNITY LICENSE TERMS
+                

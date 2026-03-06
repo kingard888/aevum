@@ -1,0 +1,35 @@
+# Configuration for Git Attributes, specifying file handling.
+# For more details on available options, refer to: https://git-scm.com
+
+# Define the default behavior for text files
+* text=auto
+
+# C++ Source and Header files
+*.cpp text
+*.hpp text
+*.c text
+*.h text
+
+# Build system and configuration files
+CMakeLists.txt text
+*.cmake text
+*.sh text
+.gitignore text
+.gitattributes text
+
+# Documentation files
+*.md text
+LICENSE text
+
+# Binary files to ensure they are never modified during checkout
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.a binary
+*.so binary
+*.lib binary
+*.dll binary
+*.exe binary

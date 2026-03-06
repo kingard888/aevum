@@ -1,0 +1,30 @@
+# Simple Security Audit configuration for AevumDB.
+# This workflow scans for vulnerabilities and prints the results directly to the logs.
+
+name: Security Audit
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * 0'
+
+jobs:
+  security:
+    name: Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner (Table output)
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'table'
+        exit-code: '0' # Don't fail the build, just show the report
+        severity: 'CRITICAL,HIGH'

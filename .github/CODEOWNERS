@@ -1,0 +1,41 @@
+# Code Owners
+# This file defines code owners for different parts of the AevumDB project.
+# GitHub will request reviews from these owners when PRs touch their code.
+
+# Default owners for everything
+* @aevumdb-team
+
+# Core database engine
+/src/aevum/db/ @aevumdb-team
+/src/aevum/db/core/ @aevumdb-team
+/src/aevum/db/storage/ @aevumdb-team
+
+# Shell and CLI
+/src/aevum/shell/ @aevumdb-team
+/src/aevum/shell/parser/ @aevumdb-team
+/src/aevum/shell/repl/ @aevumdb-team
+
+# BSON and serialization
+/src/aevum/bson/ @aevumdb-team
+
+# Client library
+/src/aevum/client/ @aevumdb-team
+
+# Utilities
+/src/aevum/util/ @aevumdb-team
+
+# Build system
+/CMakeLists.txt @aevumdb-team
+/scripts/ @aevumdb-team
+
+# Documentation
+/docs/ @aevumdb-team
+/README.md @aevumdb-team
+/CONTRIBUTING.md @aevumdb-team
+
+# GitHub workflows
+/.github/workflows/ @aevumdb-team
+
+# Tests
+/**/test/ @aevumdb-team
+/**/tests/ @aevumdb-team

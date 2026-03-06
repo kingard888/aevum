@@ -1,0 +1,30 @@
+# Configuration for clang-tidy, enforcing quality and style.
+# For more details on available options, refer to: https://clang.llvm.org
+
+# Enable a comprehensive set of diagnostic checks for C++ modernization and safety
+Checks: 'bugprone-*,
+         clang-analyzer-*,
+         google-*,
+         modernize-*,
+         performance-*,
+         portability-*,
+         readability-*'
+
+# Treats all triggered warnings as errors to enforce strict code quality (optional)
+WarningsAsErrors: ''
+
+# Configuration for specific check behaviors and naming conventions
+CheckOptions:
+  # Enforce lower_case naming for variables to maintain project-wide consistency
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case
+  # Mandate the conversion of legacy NULL macros to the modern C++11 nullptr
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL'
+
+# Dynamic regex to analyze headers within the specific project source tree
+# Note: @PROJECT_SOURCE_DIR@ will be populated by CMake during configuration
+HeaderFilterRegex: '@PROJECT_SOURCE_DIR@/src/.*'
+
+# Analysis of temporary destructors; typically disabled for standard build flows
+AnalyzeTemporaryDtors: false

@@ -1,0 +1,19 @@
+# Configuration for Rustfmt, enforcing a consistent code style.
+# For more details on available options, refer to: https://rust-lang.github.io
+
+# Core formatting rules for indentation, line length, and line endings
+max_width = 100
+hard_tabs = false
+tab_spaces = 4
+newline_style = "Unix"
+
+# Code simplification and heuristic settings for better readability
+use_field_init_shorthand = true
+use_small_heuristics = "Max"
+
+# Unstable features are disabled to maintain compatibility with stable toolchains.
+# Uncommenting these may require a Nightly Rust version.
+# imports_granularity = "Module"
+# group_imports = "StdExternalCrate"
+# format_code_in_doc_comments = true
+# trailing_comma = "Vertical"

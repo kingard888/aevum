@@ -1,0 +1,45 @@
+# Configuration for EditorConfig, enforcing a consistent coding style.
+# For more details on available options, refer to: https://editorconfig.org
+
+# Top-most EditorConfig file
+root = true
+
+# Global settings for all files
+[*]
+indent_style = space
+indent_size = 4
+tab_width = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# C/C++ specific settings
+[*.{c,cc,cpp,h,hh,hpp,cxx,hxx}]
+# Most C++ projects use 4 spaces for indentation.
+# These files will inherit the global settings (4 spaces).
+
+# Rust specific settings
+[*.rs]
+# The Rust community typically uses 4 spaces for indentation, often enforced by rustfmt.
+# These files will inherit the global settings (4 spaces).
+
+# Shell script specific settings
+[*.sh]
+# Shell scripts often use 4 spaces for indentation to maintain consistency with other languages.
+# These files will inherit the global settings (4 spaces).
+
+# Markdown specific settings
+[*.md]
+# Markdown files benefit from consistent newline, charset, and trailing whitespace removal.
+# These files will inherit the global settings (4 spaces, though indentation is less critical for prose).
+
+# Special case for Makefiles: often require tabs for proper functioning.
+[Makefile]
+indent_style = tab
+tab_width = 8
+
+# CMake specific settings
+[CMakeLists.txt]
+# CMake files typically use 4 spaces for indentation.
+# These files will inherit the global settings (4 spaces).

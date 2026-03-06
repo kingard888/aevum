@@ -1,0 +1,39 @@
+# CI configuration for AevumDB.
+# This workflow focuses on rapid Linux-based verification.
+
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-linux:
+    name: Build & Test (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential
+
+    - name: Build AevumDB
+      run: |
+        chmod +x ./scripts/build.sh
+        ./scripts/build.sh
+
+    - name: Run verification
+      run: |
+        # Check if binaries exist
+        ls -lh build/bin/aevumdb
+        ls -lh build/bin/aevumsh
+        # Run daemon help or basic test if available
+        ./build/bin/aevumdb --help || true

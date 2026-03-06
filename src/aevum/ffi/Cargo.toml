@@ -1,0 +1,30 @@
+# Configuration for Cargo, managing Rust package and build.
+# For more details on available options, refer to: https://doc.rust-lang.org
+
+[package]
+# Core identification for the AevumDB FFI (Foreign Function Interface) library
+name = "aevum_ffi"
+version = "1.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+# Define output formats: static library for C++ linking and rlib for Rust projects
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+# Serialization and deserialization frameworks with derive macro support
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Data-parallelism library for performance optimization
+rayon = "1.8"
+
+# C-standard library bindings for cross-language compatibility
+libc = "0.2"
+
+[profile.release]
+# Maximize performance with aggressive optimization and Link-Time Optimization (LTO)
+opt-level = 3
+lto = true
+codegen-units = 1

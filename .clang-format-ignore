@@ -1,0 +1,13 @@
+# List of files and directories to be ignored by clang-format.
+# For more details on available options, refer to: https://clang.llvm.org
+
+# Ignore all files within the 'third_party' directory.
+third_party/
+
+# Ignore directories containing automatically generated code or build artifacts.
+generated/
+build/
+bin/
+
+# Ignore all files under the .git directory.
+.git/
