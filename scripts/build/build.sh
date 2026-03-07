@@ -17,7 +17,7 @@
 set -e
 
 # Define the root directory of the project based on script location
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE}")" &> /dev/null && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." &> /dev/null && pwd)"
 BUILD_DIR="${PROJECT_ROOT}/build"
 
@@ -28,25 +28,44 @@ JOBS=$(nproc 2>/dev/null || echo 4)
 while [[ $# -gt 0 ]]; do
     case "$1" in
         clean)
-            echo "Cleaning build directory: $BUILD_DIR"
-            rm -rf "$BUILD_DIR"
-            echo "Build directory cleaned."
-            exit 0
+            # Store clean action, but don't exit yet so BUILD_DIR can be set
+            DO_CLEAN=true
             ;;
         -j)
             shift
-            JOBS="$1"
-            ;;
-        -*)
-            echo "Usage: ./build.sh [clean] [-j JOBS]"
-            exit 1
+            if [[ "$1" =~ ^[0-9]+$ ]]; then
+                JOBS="$1"
+            else
+                echo "Error: -j requires a positive integer argument. Received: '$1'"
+                exit 1
+            fi
             ;;
         *)
-            BUILD_DIR="$1"
+            # Treat other non-flag arguments as custom build directory
+            if [[ "$1" != -* ]]; then
+                # If relative path, make it absolute relative to current directory
+                if [[ "$1" = /* ]]; then
+                    BUILD_DIR="$1"
+                else
+                    BUILD_DIR="$(pwd)/$1"
+                fi
+            else
+                echo "Unknown option: $1"
+                echo "Usage: ./build.sh [clean] [-j JOBS] [build-dir]"
+                exit 1
+            fi
             ;;
     esac
     shift
 done
+
+# Execute clean action if requested
+if [ "$DO_CLEAN" = true ]; then
+    echo "Cleaning build directory: $BUILD_DIR"
+    rm -rf "$BUILD_DIR"
+    echo "Build directory cleaned."
+    exit 0
+fi
 
 # Create the build directory if it doesn't exist
 if [ ! -d "$BUILD_DIR" ]; then

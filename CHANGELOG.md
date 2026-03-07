@@ -5,6 +5,15 @@ All notable changes to AevumDB are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-03-07
+
+### Fixed
+- Build script parallel jobs validation (fix `-j N` error)
+- Fixed `.gitignore` accidentally ignoring build scripts
+- Improved CI reliability by focusing on Linux builds
+- Fixed Dependabot configuration errors
+- Updated Security Audit workflow to use CodeQL v3
+
 ## [1.0.0] - 2026-03-07
 
 ### Added
@@ -32,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- `1.0.1` - Build system and CI configuration fixes (March 7, 2026)
 - `1.0.0` - Initial public release (March 7, 2026)
 
 ## Upgrading
