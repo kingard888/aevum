@@ -226,7 +226,7 @@ install(TARGETS aevumdb aevumsh DESTINATION bin)
 # Output a comprehensive summary of the current build configuration for verification.
 message(STATUS "AevumDB Build Configuration Summary")
 message(STATUS "Project Root:    ${CMAKE_SOURCE_DIR}")
-message(STATUS "Output Path:      ${CMAKE_BINARY_DIR}")
+message(STATUS "Output Path:     ${CMAKE_BINARY_DIR}")
 message(STATUS "Daemon Artifact: ${CMAKE_BINARY_DIR}/bin/aevumdb")
 message(STATUS "Shell Artifact:  ${CMAKE_BINARY_DIR}/bin/aevumsh")
 message(STATUS "C++ Standard:    ${CMAKE_CXX_STANDARD}")
