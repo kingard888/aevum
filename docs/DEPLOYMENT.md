@@ -66,21 +66,20 @@ sudo make install  # Installs to /usr/local/bin/
 ### Basic Start
 
 ```bash
-# Create data directory
-mkdir -p /var/lib/aevumdb
-chown aevumdb:aevumdb /var/lib/aevumdb
-
-# Start daemon
+# Start daemon (creates data directory automatically)
 /opt/aevumdb/bin/aevumdb
 ```
 
-### With Data Directory
+### Custom Data Directory
 
-Specify custom data location:
+Specify custom data location (positional argument):
 
 ```bash
-mkdir -p /data/aevumdb
-/opt/aevumdb/bin/aevumdb --data-dir /data/aevumdb
+# Use custom directory
+/opt/aevumdb/bin/aevumdb /var/lib/aevumdb
+
+# Custom directory with custom port
+/opt/aevumdb/bin/aevumdb /data/aevumdb 55001
 ```
 
 ### Background Process
@@ -129,10 +128,8 @@ WantedBy=multi-user.target
 Enable and start:
 
 ```bash
-# Create user and directories
+# Create service user
 sudo useradd -r -s /bin/false aevumdb
-sudo mkdir -p /var/lib/aevumdb
-sudo chown aevumdb:aevumdb /var/lib/aevumdb
 
 # Enable service
 sudo systemctl enable aevumdb
@@ -155,10 +152,21 @@ sudo journalctl -u aevumdb -f
 aevumdb --help
 ```
 
-Common options:
-- `--data-dir <path>` - Data directory (default: ./data)
-- `--port <port>` - Listen port (default: 55001)  
-- `--host <host>` - Listen address (default: 127.0.0.1)
+**aevumdb** options:
+- `DATA_PATH` - Database directory (default: `./aevum_data`)
+- `PORT` - Listen port (default: `55001`)
+
+**Examples:**
+```bash
+# Default (creates ./aevum_data)
+/opt/aevumdb/bin/aevumdb
+
+# Custom data directory
+/opt/aevumdb/bin/aevumdb /var/lib/aevumdb
+
+# Custom directory and port
+/opt/aevumdb/bin/aevumdb /var/lib/aevumdb 55001
+```
 
 ### Environment Variables
 
@@ -202,16 +210,13 @@ sudo iptables-save > /etc/iptables/rules.v4
 
 #### Listen on Network Interface
 
-Change host in systemd service or:
+To configure the port that aevumdb listens on:
 
 ```bash
-/opt/aevumdb/bin/aevumdb --host 0.0.0.0 --port 55001
+/opt/aevumdb/bin/aevumdb /var/lib/aevumdb 55001
 ```
 
-⚠️ **Security**: Only expose publicly if:
-- Behind authentication (API keys)
-- Behind VPN or private network
-- In protected environment
+Note: aevumdb listens on 127.0.0.1 by default. To expose to network, use VPN or SSH tunneling.
 
 ## Storage Configuration
 
@@ -242,7 +247,7 @@ With write buffer: ~2 GB total
 #### SSD Recommended
 ```bash
 # Place data on SSD for better performance
-/opt/aevumdb/bin/aevumdb --data-dir /mnt/ssd/aevumdb
+/opt/aevumdb/bin/aevumdb /mnt/ssd/aevumdb
 ```
 
 #### Multiple Disks

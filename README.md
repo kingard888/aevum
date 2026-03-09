@@ -37,7 +37,6 @@ $ ./build/bin/aevumdb --help
 To run a single server database:
 
 ```bash
-$ mkdir -p data
 $ ./build/bin/aevumdb
 $
 $ # The shell connects to localhost by default:

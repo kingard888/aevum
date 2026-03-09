@@ -180,7 +180,7 @@ data/
 └── ... other WiredTiger files
 ```
 
-Location can be customized with `--data-dir` option.
+Location can be customized by passing a path as the first argument to aevumdb: `aevumdb /custom/path`
 
 ## /dev - Development Database (Generated)
 

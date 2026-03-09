@@ -121,8 +121,8 @@ git checkout CMakeLists.txt
 
 Option 1 - Use a different port:
 ```bash
-./build/bin/aevumdb --port 27018
-./build/bin/aevumsh --port 27018
+./build/bin/aevumdb ./aevum_data 27018
+./build/bin/aevumsh 127.0.0.1 27018
 ```
 
 Option 2 - Find and stop the process using the port:
@@ -162,14 +162,14 @@ Create with proper permissions:
 ```bash
 mkdir -p data
 chmod 755 data
-./build/bin/aevumdb --data-dir ./data
+./build/bin/aevumdb ./data
 ```
 
 Or for production:
 ```bash
 sudo mkdir -p /var/lib/aevumdb/data
 sudo chown $USER:$USER /var/lib/aevumdb
-./build/bin/aevumdb --data-dir /var/lib/aevumdb/data
+./build/bin/aevumdb /var/lib/aevumdb/data
 ```
 
 ### Problem: "Shell cannot connect to server"
@@ -194,7 +194,7 @@ netstat -tlnp | grep 27017
 
 3. Try explicit host and port:
 ```bash
-./build/bin/aevumsh --host localhost --port 27017
+./build/bin/aevumsh localhost 27017
 ```
 
 4. Check firewall:
@@ -337,22 +337,11 @@ aevumsh> kill_connection <id>  # For idle connections
 
 ## Debug Mode
 
-### Enable verbose logging
-
-```bash
-./build/bin/aevumdb --log-level debug
-```
-
-Check logs:
-```bash
-tail -f data/logs/aevumdb.log
-```
-
 ### Run with GDB debugger
 
 ```bash
 gdb ./build/bin/aevumdb
-(gdb) run --log-level debug
+(gdb) run
 (gdb) bt  # Print backtrace on crash
 ```
 
@@ -376,10 +365,7 @@ Send this file when reporting issues.
 
 When reporting an issue, include:
 
-1. **Version:**
-```bash
-./build/bin/aevumdb --version
-```
+1. **Version:** Check `git log --oneline -1` or the release notes
 
 2. **OS and hardware:**
 ```bash
@@ -389,9 +375,9 @@ free -h
 
 3. **Steps to reproduce** - Exact commands that cause the issue
 
-4. **Error output:**
+4. **Error output and full command invocation:**
 ```bash
-./build/bin/aevumdb --log-level debug 2>&1 | tee error.log
+./build/bin/aevumdb ./aevum_data 2>&1 | tee error.log
 ```
 
 5. **Diagnostic dump:**

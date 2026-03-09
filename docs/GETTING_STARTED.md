@@ -31,9 +31,6 @@ Binaries will be at:
 In one terminal:
 
 ```bash
-# Create data directory
-mkdir -p data
-
 # Start the daemon
 ./build/bin/aevumdb
 ```
