@@ -12,6 +12,7 @@ _CPack_Packages/
 
 # Rust compilation outputs and dependency artifacts
 target/
+Cargo.lock
 
 # Common object files and compiled binary formats
 *.o
