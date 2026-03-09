@@ -375,7 +375,22 @@ perf report
 
 ## Testing
 
-Manual testing workflow:
+### FFI Unit Tests
+
+Run Rust FFI module tests:
+
+```bash
+# Run all FFI tests
+./scripts/test.sh
+
+# Run specific test with output
+./scripts/test.sh -- test_name --nocapture
+
+# Run tests sequentially
+./scripts/test.sh -- --single-threaded
+```
+
+### Manual Testing Workflow
 
 ```bash
 # Terminal 1: Start daemon

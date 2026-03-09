@@ -72,11 +72,13 @@ Fixes #123
 3. Keep commits logical and focused (one feature/fix per commit)
 4. Test your changes thoroughly
 5. Format code: `./scripts/format.sh`
-6. Build successfully: `./scripts/build.sh`
+6. Run tests: `./scripts/test.sh` (for FFI changes)
+7. Build successfully: `./scripts/build.sh`
 
 ### Testing
 
-- Add unit tests for new functionality
+- Add unit tests for new functionality (especially for FFI modules)
+- Run FFI tests: `./scripts/test.sh`
 - Run existing tests to ensure no regressions
 - Include test cases in your pull request description
 

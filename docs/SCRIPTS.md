@@ -17,6 +17,9 @@ AevumDB includes utility scripts for building, formatting code, and development 
 # Format Rust code
 ./scripts/format.sh rust
 
+# Run FFI tests
+./scripts/test.sh
+
 # Show help
 ./scripts/build.sh --help
 ```
@@ -194,20 +197,79 @@ rustup update
 ./scripts/format/format-rust.sh
 ```
 
+## Test Scripts
+
+### scripts/test.sh
+
+Test orchestrator script. Runs cargo tests for the FFI module in AevumDB.
+
+**Location**: `/scripts/test.sh`
+
+**Usage**:
+```bash
+./scripts/test.sh [OPTIONS]
+```
+
+**What it does**:
+1. Navigates to the `src/aevum/ffi` directory
+2. Executes `cargo test` with specified options
+3. Provides comprehensive test coverage for the Foreign Function Interface
+4. Reports test results
+
+**Options** (pass to cargo):
+- `(default)` - Run all tests
+- `-- --test-name` - Run specific test
+- `-- --nocapture` - Run tests with output visible
+- `-- --single-threaded` - Run tests sequentially
+
+**Example**:
+```bash
+# Run all tests
+./scripts/test.sh
+
+# Run specific test with output
+./scripts/test.sh -- test_name --nocapture
+
+# Run tests sequentially
+./scripts/test.sh -- --single-threaded
+```
+
+### scripts/test/test.sh
+
+Core test logic. Called by `scripts/test.sh`.
+
+**Location**: `/scripts/test/test.sh`
+
+**What it does**:
+1. Validates FFI directory exists
+2. Checks for `Cargo.toml` in the FFI directory
+3. Executes `cargo test` with passed arguments
+4. Reports completion status
+
+**Requirements**:
+- Rust toolchain installed
+- `Cargo.toml` present in `src/aevum/ffi/`
+
+**Usually called automatically** - Use `./scripts/test.sh` instead.
+
 ## Directory Structure
 
 ```
 scripts/
 ├── build.sh                 # Main build script (user-facing)
 ├── format.sh                # Main format script (user-facing)
+├── test.sh                  # Main test script (user-facing)
 │
 ├── build/
 │   └── build.sh            # Build implementation
 │
-└── format/
-    ├── format.sh           # Format orchestrator
-    ├── format-cpp.sh       # C++ formatting
-    └── format-rust.sh      # Rust formatting
+├── format/
+│   ├── format.sh           # Format orchestrator
+│   ├── format-cpp.sh       # C++ formatting
+│   └── format-rust.sh      # Rust formatting
+│
+└── test/
+    └── test.sh             # Test implementation
 ```
 
 ## Common Tasks

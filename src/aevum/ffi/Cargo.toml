@@ -4,7 +4,7 @@
 [package]
 # Core identification for the AevumDB FFI (Foreign Function Interface) library
 name = "aevum_ffi"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 publish = false
 
