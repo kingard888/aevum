@@ -31,7 +31,7 @@ What actually happens instead.
 ## Environment
 
 - **AevumDB Version**: (output of `./build/bin/aevumdb --version`)
-- **OS**: (Linux, macOS, etc.)
+- **OS**: Linux (Ubuntu, Fedora, Debian, etc.)
 - **OS Version**: (output of `uname -a`)
 - **Compiler**: (gcc, clang, etc.)
 - **C++ Version**: (C++17, C++20, etc.)

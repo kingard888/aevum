@@ -216,8 +216,11 @@ User Output
 ### WiredTiger build fails
 ```bash
 # Usually missing Python or pkg-config
-sudo apt install python3 pkg-config  # Ubuntu
-brew install python3 pkg-config       # macOS
+# Ubuntu/Debian
+sudo apt install python3 pkg-config
+
+# Fedora/RHEL
+sudo dnf install python3 pkgconfig
 
 # Clean and rebuild
 rm -rf build && mkdir build && cd build

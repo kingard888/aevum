@@ -13,20 +13,9 @@ Solutions to common problems with AevumDB.
 
 **Solutions:**
 
-Ubuntu/Debian:
 ```bash
 sudo apt-get update
 sudo apt-get install cmake
-```
-
-macOS:
-```bash
-brew install cmake
-```
-
-Fedora/RHEL:
-```bash
-sudo dnf install cmake
 ```
 
 Verify installation:
@@ -44,19 +33,8 @@ cmake --version
 
 **Solutions:**
 
-Ubuntu/Debian:
 ```bash
 sudo apt-get install build-essential
-```
-
-macOS:
-```bash
-xcode-select --install
-```
-
-Fedora/RHEL:
-```bash
-sudo dnf install gcc-c++ make
 ```
 
 Verify installation:
@@ -198,11 +176,14 @@ netstat -tlnp | grep 27017
 ```
 
 4. Check firewall:
-```bash
-# Ubuntu
-sudo ufw allow 27017
 
-# Fedora
+Ubuntu/Debian (ufw):
+```bash
+sudo ufw allow 27017
+```
+
+Fedora/RHEL (firewalld):
+```bash
 sudo firewall-cmd --permanent --add-port=27017/tcp
 sudo firewall-cmd --reload
 ```

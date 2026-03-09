@@ -6,7 +6,7 @@ This directory contains GitHub-specific workflows, templates, and configuration 
 
 ### Workflows ([`../.github/workflows/`](../.github/workflows/))
 - `ci.yml` - Continuous Integration pipeline
-  - Builds on Ubuntu and macOS
+  - Builds on Linux (Ubuntu, Fedora, Debian, etc.)
   - Tests with GCC and Clang compilers
   - Runs code formatting checks
   - Performs security scans

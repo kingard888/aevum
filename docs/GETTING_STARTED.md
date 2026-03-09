@@ -4,9 +4,9 @@ Get AevumDB running in 5 minutes and start using it immediately!
 
 ## Prerequisites
 
-- **Linux** (Ubuntu 20.04+, Fedora 33+) or **macOS** (10.15+)
+- **Linux** (Ubuntu 20.04+, Fedora 33+, or other Linux distributions)
 - **Git**
-- **Build tools**: CMake 3.21+, C++17 compiler (g++ / clang), Make
+- **Build tools**: CMake 3.21+, C++17 compiler (g++), Make
 - **WiredTiger dependencies**: Python 3, pkg-config
 
 ## Installation

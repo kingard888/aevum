@@ -25,16 +25,6 @@ sudo apt update
 sudo apt install -y build-essential cmake g++ git python3 pkg-config cargo
 ```
 
-### macOS
-
-```bash
-# Install Homebrew if needed
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Install dependencies
-brew install cmake g++ python3 pkg-config rust
-```
-
 ### Fedora/RHEL
 
 ```bash
@@ -245,37 +235,39 @@ Requirements:
 
 ### CMake not found
 
+Ubuntu/Debian:
 ```bash
-# Ubuntu/Debian
 sudo apt install cmake
+```
 
-# macOS
-brew install cmake
-
-# Fedora
+Fedora/RHEL:
+```bash
 sudo dnf install cmake
 ```
 
 ### C++ compiler missing
 
+Ubuntu/Debian:
 ```bash
-# Ubuntu/Debian
 sudo apt install build-essential
+```
 
-# macOS
-xcode-select --install
-
-# Fedora
+Fedora/RHEL:
+```bash
 sudo dnf install gcc-c++
 ```
 
 ### WiredTiger build fails
 
+Ubuntu/Debian:
 ```bash
-# Usually means missing Python or pkg-config
-sudo apt install python3 pkg-config  # Ubuntu/Debian
-brew install python3 pkg-config       # macOS
-sudo dnf install python3 pkgconfig    # Fedora
+sudo apt install python3 pkg-config
+```
+
+Fedora/RHEL:
+```bash
+sudo dnf install python3 pkgconfig
+```
 
 # Clean and rebuild
 rm -rf build

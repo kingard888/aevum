@@ -19,15 +19,6 @@ sudo apt update
 sudo apt install -y build-essential cmake g++ git python3 pkg-config gdb lldb valgrind clang-format
 ```
 
-**macOS**
-```bash
-# Install Xcode command line tools
-xcode-select --install
-
-# Install dependencies with Homebrew
-brew install cmake python3 pkg-config lldb clang-format
-```
-
 **Fedora 33+**
 ```bash
 sudo dnf install -y cmake gcc-c++ python3 pkgconfig gdb llvm-tools valgrind clang-tools-extra
@@ -241,20 +232,6 @@ gdb ./build_dev/bin/aevumdb
 (gdb) print variable_name
 (gdb) next
 (gdb) quit
-```
-
-### With LLDB (macOS/Linux)
-
-```bash
-lldb ./build_dev/bin/aevumdb
-
-# Inside LLDB
-(lldb) run
-(lldb) breakpoint set --name main
-(lldb) continue
-(lldb) frame variable
-(lldb) next
-(lldb) quit
 ```
 
 ### Debug Output

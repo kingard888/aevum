@@ -150,14 +150,10 @@ C++ code formatting using `clang-format`.
 
 **Requirements**:
 ```bash
-# Install clang-format
 # Ubuntu/Debian
 sudo apt install clang-format
 
-# macOS
-brew install clang-format
-
-# Fedora
+# Fedora/RHEL
 sudo dnf install clang-tools-extra
 ```
 
@@ -345,18 +341,19 @@ export CXX=g++
 
 ```bash
 # Install CMake
-sudo apt install cmake    # Ubuntu/Debian
-brew install cmake        # macOS
-sudo dnf install cmake    # Fedora
+sudo apt install cmake
 ```
 
 ### Format fails: "clang-format not found"
 
+Ubuntu/Debian:
 ```bash
-# Install clang-format
-sudo apt install clang-format    # Ubuntu/Debian
-brew install clang-format        # macOS
-sudo dnf install clang-tools-extra # Fedora
+sudo apt install clang-format
+```
+
+Fedora/RHEL:
+```bash
+sudo dnf install clang-tools-extra
 ```
 
 ### Format fails: "rustfmt not found"

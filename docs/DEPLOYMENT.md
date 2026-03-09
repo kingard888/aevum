@@ -26,7 +26,7 @@ Deploy and run AevumDB in production environments.
 
 ### Software Requirements
 
-- **OS**: Linux 20.04+ or macOS 10.15+
+- **OS**: Linux 20.04+ (Ubuntu, Fedora, Debian, etc.)
 - **Runtime**: None (static binary)
 - **Dependencies**: Built into binary
 
@@ -183,7 +183,7 @@ export AEVUMDB_PORT=55001
 
 ### Network Configuration
 
-#### Firewall (UFW on Ubuntu)
+#### Firewall (ufw on Ubuntu/Debian)
 
 Allow connections on port 55001:
 
@@ -193,7 +193,7 @@ sudo ufw enable
 sudo ufw status
 ```
 
-#### Firewall (firewalld on Fedora)
+#### Firewall (firewalld on Fedora/RHEL)
 
 ```bash
 sudo firewall-cmd --permanent --add-port=55001/tcp
