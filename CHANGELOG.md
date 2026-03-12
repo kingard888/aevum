@@ -5,6 +5,20 @@ All notable changes to AevumDB are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-03-13
+
+### Added
+- Support for the **Ninja** build system as the primary generator for faster builds.
+- Integrated **ccache** support for near-instant rebuilds.
+- Automatic installation of `ninja-build` and `ccache` in the build script.
+
+### Updated
+- `CMakeLists.txt` - Fixed double compilation of source files by introducing a shared `aevum_core` static library and cleaned up duplicated Rust FFI logic.
+- `scripts/build/build.sh` - Enhanced to prioritize Ninja, enable ccache, and automate installation of new build tools.
+- `docs/BUILDING.md` - Added documentation for Ninja, ccache, and build performance optimizations.
+- `docs/SCRIPTS.md` - Documented enhanced build script features and automated tool detection.
+- `src/aevum/ffi/Cargo.toml` - Bumped version to 1.1.2.
+
 ## [1.1.1] - 2026-03-12
 
 ### Added
@@ -102,6 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- `1.1.2` - Build system optimizations (ccache, Ninja, Core Lib) (March 13, 2026)
 - `1.1.1` - Automated dependency installation (March 12, 2026)
 - `1.1.0` - Shell improvements and 'clear' command (March 11, 2026)
 - `1.0.3` - Code linting script suite (March 10, 2026)

@@ -15,6 +15,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Enable ccache if available to speed up rebuilds significantly.
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    message(STATUS "Found ccache: ${CCACHE_PROGRAM}. Enabling compiler cache...")
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+endif()
+
 # Define the centralized output locations for the resulting binaries and libraries.
 # This ensures a clean build artifact structure within the binary directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -124,18 +132,15 @@ list(FILTER ALL_SOURCES EXCLUDE REGEX "main\\.cpp$")
 set(DAEMON_MAIN "${CMAKE_SOURCE_DIR}/src/aevum/main.cpp")
 set(SHELL_MAIN "${CMAKE_SOURCE_DIR}/src/aevum/shell/main.cpp")
 
-# Compilation and Linking for the AevumDB Daemon
-# The 'aevumdb' target represents the central database server process.
-
-message(STATUS "Configuring build for the AevumDB Daemon (aevumdb)...")
-add_executable(aevumdb ${DAEMON_MAIN} ${ALL_SOURCES})
-add_dependencies(aevumdb wiredtiger_project)
+# Define a common static library for AevumDB core logic to avoid double compilation.
+add_library(aevum_core STATIC ${ALL_SOURCES})
+add_dependencies(aevum_core wiredtiger_project)
 if(CARGO_EXECUTABLE)
-    add_dependencies(aevumdb rust_ffi_target)
+    add_dependencies(aevum_core rust_ffi_target)
 endif()
 
-# Define target-specific inclusion paths for headers.
-target_include_directories(aevumdb PRIVATE
+# Define core-specific inclusion paths for headers.
+target_include_directories(aevum_core PUBLIC
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/third_party/simdjson/include
     ${CMAKE_SOURCE_DIR}/third_party/mongo-c-driver/src/libbson/src/bson
@@ -143,32 +148,35 @@ target_include_directories(aevumdb PRIVATE
     ${WIREDTIGER_INCLUDE_DIR}
 )
 
-# Associate the daemon with its required static and system libraries.
-target_link_libraries(aevumdb PRIVATE
+# Link core dependencies.
+target_link_libraries(aevum_core PUBLIC
     simdjson
     bson_static
     "${WIREDTIGER_STATIC_LIB}"
-    pthread
-    m
-    dl
-    rt
 )
 
-# Link the Rust FFI library if it was successfully configured.
 if(CARGO_EXECUTABLE)
-    target_link_libraries(aevumdb PRIVATE "${RUST_FFI_LIB}")
+    target_link_libraries(aevum_core PUBLIC "${RUST_FFI_LIB}")
 else()
-    # Check for pre-existing library if Cargo wasn't found.
     set(PREBUILT_RUST_FFI "${CMAKE_SOURCE_DIR}/src/aevum/ffi/target/release/libaevum_ffi.a")
     if(EXISTS "${PREBUILT_RUST_FFI}")
-        target_link_libraries(aevumdb PRIVATE "${PREBUILT_RUST_FFI}")
+        target_link_libraries(aevum_core PUBLIC "${PREBUILT_RUST_FFI}")
     endif()
 endif()
 
+# Compilation and Linking for the AevumDB Daemon
+# The 'aevumdb' target represents the central database server process.
+
+message(STATUS "Configuring build for the AevumDB Daemon (aevumdb)...")
+add_executable(aevumdb ${DAEMON_MAIN})
+target_link_libraries(aevumdb PRIVATE aevum_core pthread m dl rt)
+
 # Apply platform-specific compilation flags to ensure optimal code generation.
 if(NOT MSVC)
+    target_compile_options(aevum_core PRIVATE -Wall -Wextra -O3)
     target_compile_options(aevumdb PRIVATE -Wall -Wextra -O3)
 else()
+    target_compile_options(aevum_core PRIVATE /W4)
     target_compile_options(aevumdb PRIVATE /W4)
 endif()
 
@@ -176,40 +184,8 @@ endif()
 # The 'aevumsh' target provides the interactive user interface to the database.
 
 message(STATUS "Configuring build for the AevumDB Shell (aevumsh)...")
-add_executable(aevumsh ${SHELL_MAIN} ${ALL_SOURCES})
-add_dependencies(aevumsh wiredtiger_project)
-if(CARGO_EXECUTABLE)
-    add_dependencies(aevumsh rust_ffi_target)
-endif()
-
-# Define target-specific inclusion paths for headers.
-target_include_directories(aevumsh PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/third_party/simdjson/include
-    ${CMAKE_SOURCE_DIR}/third_party/mongo-c-driver/src/libbson/src/bson
-    ${CMAKE_BINARY_DIR}/third_party/mongo-c-driver/src/libbson/src/bson
-    ${WIREDTIGER_INCLUDE_DIR}
-)
-
-# Associate the shell with its required libraries, maintaining consistency with the daemon.
-target_link_libraries(aevumsh PRIVATE
-    simdjson
-    bson_static
-    "${WIREDTIGER_STATIC_LIB}"
-    pthread
-    m
-    dl
-    rt
-)
-
-# Link the Rust FFI library if it was successfully configured.
-if(CARGO_EXECUTABLE)
-    target_link_libraries(aevumsh PRIVATE "${RUST_FFI_LIB}")
-else()
-    if(EXISTS "${PREBUILT_RUST_FFI}")
-        target_link_libraries(aevumsh PRIVATE "${PREBUILT_RUST_FFI}")
-    endif()
-endif()
+add_executable(aevumsh ${SHELL_MAIN})
+target_link_libraries(aevumsh PRIVATE aevum_core pthread m dl rt)
 
 # Apply optimization and warning flags for the shell executable.
 if(NOT MSVC)

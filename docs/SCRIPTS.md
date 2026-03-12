@@ -52,35 +52,32 @@ Main build orchestrator script. Handles CMake configuration, compilation, and ou
 
 **What it does**:
 1. Creates `build/` directory if not present
-2. Runs `cmake ..` to configure
-3. Runs `make -j N` (default uses all available cores)
-4. Outputs binaries to `build/bin/`
+2. Checks for and installs required build tools (**Ninja**, **ccache**, **CMake**, etc.)
+3. Runs `cmake` with the **Ninja** generator if available
+4. Executes the build with parallel jobs (auto-detected)
+5. Outputs binaries to `build/bin/`
 
 **Example**:
 ```bash
-# Standard build using all cores
+# Standard optimized build
 ./scripts/build.sh
 
-# Build with specifically 4 parallel jobs
+# Build with 4 parallel jobs
 ./scripts/build.sh -j 4
-
-# Verbose build to see compiler output
-./scripts/build.sh verbose
 ```
 
 ### scripts/build/build.sh
 
-Core build logic. Called by `scripts/build.sh`.
+Core build logic with advanced performance detection.
 
 **Location**: `/scripts/build/build.sh`
 
 **What it does**:
-- Detects missing dependencies (`cc`, `c++`, `rustc`, `cmake`) and installs them automatically on supported systems (Arch, Debian/Ubuntu, Fedora).
-- Detects build type (Debug/Release)
-- Creates build directory
-- Runs CMake with appropriate flags
-- Executes make with parallel jobs
-- Verifies binary creation
+- Detects and installs missing dependencies (`cc`, `c++`, `rustc`, `cmake`, `ninja`, `ccache`).
+- Automatically prioritizes the **Ninja** build system for faster performance.
+- Enables **ccache** globally to accelerate project and dependency rebuilds.
+- Orchestrates the compilation of the Rust FFI module and its integration into the C++ project.
+- Verifies and organizes build artifacts.
 
 **Configuration**:
 - `CMAKE_BUILD_TYPE`: Release (optimized) or Debug

@@ -40,22 +40,32 @@ check_and_install_deps() {
         missing_deps+=("cmake")
     fi
 
+    # Check for Ninja (Highly recommended for speed)
+    if ! command -v ninja &> /dev/null; then
+        missing_deps+=("ninja")
+    fi
+
+    # Check for ccache (Highly recommended for speed)
+    if ! command -v ccache &> /dev/null; then
+        missing_deps+=("ccache")
+    fi
+
     if [ ${#missing_deps[@]} -eq 0 ]; then
         return 0
     fi
 
-    echo "Missing dependencies: ${missing_deps[*]}"
+    echo "Recommended dependencies missing: ${missing_deps[*]}"
     echo "Attempting to install missing tools..."
 
     # Detect package manager
     if command -v pacman &> /dev/null; then
         echo "Detected Arch Linux (pacman)"
-        sudo pacman -S --noconfirm base-devel rustup cmake
+        sudo pacman -S --noconfirm base-devel rustup cmake ninja ccache
         rustup default stable
     elif command -v apt-get &> /dev/null; then
         echo "Detected Debian/Ubuntu (apt-get)"
         sudo apt-get update
-        sudo apt-get install -y build-essential curl cmake
+        sudo apt-get install -y build-essential curl cmake ninja-build ccache
         # Install Rust via rustup if not available via apt
         if ! command -v rustc &> /dev/null; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -64,9 +74,9 @@ check_and_install_deps() {
     elif command -v dnf &> /dev/null; then
         echo "Detected Fedora/RHEL (dnf)"
         sudo dnf groupinstall -y "Development Tools"
-        sudo dnf install -y cmake rust cargo
+        sudo dnf install -y cmake rust cargo ninja-build ccache
     else
-        echo "Error: Unknown package manager. Please install C/C++ compilers, Rust, and CMake manually."
+        echo "Error: Unknown package manager. Please install C/C++ compilers, Rust, CMake, Ninja, and ccache manually."
         exit 1
     fi
 }
@@ -76,6 +86,14 @@ check_and_install_deps
 
 # Default number of parallel jobs (use all available cores)
 JOBS=$(nproc 2>/dev/null || echo 4)
+
+# Detect build tool (prefer Ninja)
+BUILD_TOOL="make"
+CMAKE_GENERATOR=""
+if command -v ninja &> /dev/null; then
+    BUILD_TOOL="ninja"
+    CMAKE_GENERATOR="-G Ninja"
+fi
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
@@ -136,15 +154,19 @@ cd "$BUILD_DIR"
 
 # Run CMake configuration
 echo ""
-echo "Configuring AevumDB with CMake..."
+echo "Configuring AevumDB with CMake (Generator: ${BUILD_TOOL})..."
 echo ""
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON "$PROJECT_ROOT"
+cmake ${CMAKE_GENERATOR} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON "$PROJECT_ROOT"
 
 # Build the project
 echo ""
-echo "Building AevumDB (using $JOBS parallel jobs)..."
+echo "Building AevumDB (using $JOBS parallel jobs with $BUILD_TOOL)..."
 echo ""
-make -j"$JOBS"
+if [ "$BUILD_TOOL" = "ninja" ]; then
+    ninja -j"$JOBS"
+else
+    make -j"$JOBS"
+fi
 
 # Display build summary
 echo ""
