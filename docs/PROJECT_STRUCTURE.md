@@ -10,12 +10,11 @@ aevumdb/
 ├── LICENSE                 # Community license
 ├── CMakeLists.txt         # CMake build configuration
 ├── docs/                  # Documentation
-├── scripts/               # Build and utility scripts
+├── scripts/               # Build, install, and utility scripts
 ├── src/                   # Source code
 ├── third_party/           # External dependencies
+│   └── dist/              # Persistent pre-built libraries (v1.2.0+)
 ├── build/                 # Build output (generated)
-├── data/                  # Database storage (generated)
-├── dev/                   # Development database (generated)
 └── .git/                  # Git repository metadata
 ```
 
@@ -38,26 +37,32 @@ docs/
 
 **See** [docs/README.md](README.md) for documentation index.
 
-## /scripts - Build and Utilities
+## /scripts - Build, Install, and Utilities
 
-Build automation and development scripts.
+Automation and development scripts.
 
 ```
 scripts/
 ├── build.sh              # Main build orchestrator
-│                         # Usage: ./scripts/build.sh [clean|rebuild|verbose]
+├── install.sh            # Main installation orchestrator (v1.2.0+)
 ├── format.sh             # Code formatting orchestrator
-│                         # Usage: ./scripts/format.sh [cpp|rust]
+├── lint.sh               # Code analysis (clang-tidy) orchestrator
+├── test.sh               # FFI testing orchestrator
 ├── build/
-│   └── build.sh          # Core build logic
-│                         # Handles CMake configuration and make
-└── format/
-    ├── format.sh         # Formatting orchestrator
-    ├── format-cpp.sh     # C++ formatting with clang-format
-    └── format-rust.sh    # Rust formatting with rustfmt
+│   └── build.sh          # Core build logic (Ninja/ccache prioritized)
+├── install/
+│   ├── install.sh        # Core installation logic (/opt/aevumdb)
+│   └── aevumdb.service   # systemd service definition
+├── format/
+│   ├── format-cpp.sh     # C++ formatting
+│   └── format-rust.sh    # Rust formatting
+├── lint/
+│   └── lint.sh           # C++ analysis implementation
+└── test/
+    └── test.sh           # Rust FFI test implementation
 ```
 
-**See** [docs/BUILDING.md](BUILDING.md) for detailed build instructions.
+**See** [docs/SCRIPTS.md](SCRIPTS.md) for detailed script documentation.
 
 ## /src - Source Code
 
@@ -65,57 +70,27 @@ Application source code organized by component.
 
 ```
 src/aevum/
-├── main.cpp              # Daemon server entry point
-│                         # - Initializes database engine
-│                         # - Starts network server
-│                         # - Handles POSIX signals
+├── main.cpp              # Daemon server entry point (config parsing enabled)
 │
 ├── db/                   # Database engine core
-│   ├── core/
-│   │   ├── core.hpp      # Core class (main orchestrator)
-│   │   └── core.cpp      # Core implementation
-│   │
+│   ├── core/             # Core engine logic
 │   ├── storage/          # Physical data persistence
-│   │   └── wiredtiger_store.hpp  # WiredTiger integration
-│   │
 │   ├── auth/             # Authentication and authorization
-│   │   └── auth_manager.hpp      # User and role management
-│   │
 │   ├── schema/           # Schema validation
-│   │   └── schema_manager.hpp    # Schema definitions
-│   │
 │   └── index/            # Query indexing
-│       └── index_manager.hpp     # Index management
 │
 ├── shell/                # Interactive shell client
 │   ├── main.cpp          # Shell entry point
-│   ├── repl/
-│   │   ├── repl.hpp      # Read-Eval-Print Loop
-│   │   └── repl.cpp      # REPL implementation
-│   └── parser/
-│       ├── command_parser.hpp    # Command parsing
-│       └── command_parser.cpp    # Parser implementation
+│   ├── repl/             # Read-Eval-Print Loop
+│   └── parser/           # Command parsing
 │
 ├── client/               # Client library
-│   ├── aevum_client.hpp  # High-level C++ API
-│   ├── aevum_client.cpp  # Client implementation
-│   └── net/
-│       ├── server.hpp    # Network server (daemon)
-│       ├── connection.hpp # TCP connection (client)
-│       └── ...           # Network utilities
 │
 ├── bson/                 # BSON document serialization
-│   ├── doc/
-│   │   ├── document.hpp  # Document representation
-│   │   └── builder.hpp   # Document builder
-│   └── json/
-│       └── json.hpp      # JSON conversion utilities
 │
 └── util/                 # Utility functions
     ├── log/              # Logging utilities
-    ├── memory/           # Memory management (arena allocator)
-    ├── concurrency/      # Thread synchronization
-    ├── string/           # String utilities
+    ├── memory/           # Memory management
     ├── status.hpp        # Status/error codes
     └── ...               # Other utilities
 ```
@@ -124,110 +99,62 @@ src/aevum/
 
 ## /third_party - External Dependencies
 
-External libraries built as part of the project.
+External libraries and their persistent pre-built artifacts.
 
 ```
 third_party/
-├── wiredtiger/
-│   ├── CMakeLists.txt
-│   ├── src/              # Storage engine source
-│   ├── include/          # Public headers
-│   └── ...
+├── dist/                 # Pre-built artifacts (survives 'rm -rf build')
+│   ├── bin/
+│   ├── include/
+│   └── lib/              # libwiredtiger.a, libbson-static-1.0.a
 │
-├── mongo-c-driver/
-│   ├── CMakeLists.txt
-│   ├── src/              # BSON library source
-│   ├── src/bson/         # BSON implementation
-│   └── ...
-│
-└── simdjson/
-    ├── CMakeLists.txt
-    ├── src/              # JSON parser source
-    ├── include/          # Public headers
-    └── ...
+├── wiredtiger/           # Storage engine source
+├── mongo-c-driver/       # BSON library source
+└── simdjson/             # JSON parser source
 ```
 
 **See** [docs/THIRD_PARTY.md](THIRD_PARTY.md) for external dependencies.
 
 ## /build - Build Output (Generated)
 
-Created when building the project.
+Created when building the project. Safe to delete.
 
 ```
 build/
-├── bin/                  # Compiled binaries
-│   ├── aevumdb          # Database server daemon
-│   └── aevumsh          # Interactive shell
+├── bin/                  # Compiled binaries (aevumdb, aevumsh)
 ├── lib/                 # Library files
-├── CMakeFiles/          # CMake build files
-├── Makefile             # Generated Makefile
-└── cmake_install.cmake  # CMake install script
+└── ...                  # CMake artifacts
 ```
 
-Regenerated on each build. Safe to delete: `rm -rf build`
+## System Installation Paths (v1.2.0+)
 
-## /data - Database Storage (Generated)
-
-Default location for persistent database files.
+When using `sudo ./scripts/install.sh`:
 
 ```
-data/
-├── database.wt          # Main WiredTiger database file
-├── WiredTiger           # WiredTiger metadata
-├── WiredTiger.basecfg   # WiredTiger base configuration
-├── WiredTiger.turtle    # WiredTiger turtle file
-├── WiredTiger.lock      # Lock file
-└── ... other WiredTiger files
+/opt/aevumdb/
+├── bin/                  # System binaries
+├── data/                 # Default database storage
+└── log/                  # System logs
+
+/etc/aevum/
+└── aevumdb.conf          # System-wide configuration
+
+/usr/local/bin/
+├── aevumdb               # Symlink to /opt/aevumdb/bin/aevumdb
+└── aevumsh               # Symlink to /opt/aevumdb/bin/aevumsh
 ```
-
-Location can be customized by passing a path as the first argument to aevumdb: `aevumdb /custom/path`
-
-## /dev - Development Database (Generated)
-
-Temporary development database for testing and exploration.
-
-```
-dev/
-├── _auth.wt             # Authentication data
-├── users.wt             # User collection
-├── _schemas.wt          # Schema definitions
-└── ... other data files
-```
-
-Created during development testing. Safe to delete.
-
-## File Naming Conventions
-
-### C++ Files
-- **Headers**: `.hpp` extension
-- **Implementation**: `.cpp` extension
-- Example: `core.hpp` and `core.cpp`
-
-### Source Organization
-- **Classes**: One per file pair (hpp/cpp)
-- **Namespaces**: Organized hierarchically
-  - `aevum::db::core::Core`
-  - `aevum::shell::repl`
-  - `aevum::util::log`
-
-### Documentation Files
-- **Markdown**: `.md` extension
-- **Index**: `README.md`
-- **Guides**: `GUIDE_NAME.md` (e.g., `BUILDING.md`)
 
 ## Configuration Files
 
 ### Build
 - `CMakeLists.txt` - Main build configuration
-- `cmake/` subdirectories - CMake helpers
+
+### System
+- `/etc/aevum/aevumdb.conf` - Daemon configuration (YAML)
 
 ### Code Style
 - `.clang-format` - C++ formatting rules
 - `rustfmt.toml` - Rust formatting config
-
-### Version Control
-- `.git/` - Git repository
-- `.gitignore` - Ignored files
 
 ## Key Relationships
 
@@ -240,30 +167,27 @@ Created during development testing. Safe to delete.
     │              │              │              │
     ▼              ▼              ▼              ▼
  /docs/        /scripts/        /src/      /third_party/
-Building    Build system     Source code   Dependencies
- & running  Formatting        Core apps    WiredTiger
- Database   Cleanup           Auth        BSON
-            Development       Storage     JSON Parser
+Building    Build/Install    Source code   Persistent
+ & running  Formatting        Core apps    Vendor
+ Database   Analysis          Auth        Strategy
+            Testing           Storage     (libbson, WT)
 ```
 
 ## Build Process Flow
 
 ```
-CMakeLists.txt
+CMake (Ninja/ccache)
     ↓
-    ├─→ Configures third_party/ libraries
-    │   ├─ mongo-c-driver (BSON)
-    │   ├─ simdjson (JSON parsing)
-    │   └─ wiredtiger (Storage)
+    ├─→ Checks third_party/dist for pre-built artifacts
+    │   └─ If missing, builds WiredTiger and libbson once
     │
-    ├─→ Compiles src/ code
-    │   ├─ db/ (Database engine)
-    │   ├─ client/ (Client library)
-    │   └─ shell/ (Interactive shell)
+    ├─→ Generates aevum_core static library
+    │   ├─ Unity Build enabled (batching)
+    │   └─ Precompiled Headers (PCH) enabled
     │
     └─→ Links into binaries
-        ├─ build/bin/aevumdb (Server)
-        └─ build/bin/aevumsh (Shell)
+        ├─ aevumdb (Daemon)
+        └─ aevumsh (Shell)
 ```
 
 ## Common Paths Reference
@@ -272,16 +196,15 @@ CMakeLists.txt
 |------|----------|
 | Server binary | `build/bin/aevumdb` |
 | Shell binary | `build/bin/aevumsh` |
-| Documentation | `docs/` |
+| System Install | `/opt/aevumdb` |
+| System Config | `/etc/aevum/aevumdb.conf` |
 | Source code | `src/aevum/` |
-| Database files | `data/` (default) |
-| Build output | `build/` |
 | Build script | `scripts/build.sh` |
-| Format script | `scripts/format.sh` |
+| Install script | `scripts/install.sh` |
 
 ## See Also
 
 - [Building](BUILDING.md) - How to compile
-- [Development](DEVELOPMENT.md) - How to develop
+- [Deployment](DEPLOYMENT.md) - System installation
+- [Scripts](SCRIPTS.md) - Build/Install/Utility scripts
 - [Architecture](ARCHITECTURE.md) - How it works
-- [THIRD_PARTY.md](THIRD_PARTY.md) - External libraries

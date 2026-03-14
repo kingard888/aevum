@@ -2,466 +2,124 @@
 
 Complete guide to building AevumDB from source with various configuration options.
 
-## Quick Build
+## Quick Build & Install
 
-AevumDB includes a smart build script that automatically detects and installs missing dependencies (compilers, Rust, CMake, **Ninja**, and **ccache**) on supported Linux distributions (Arch, Debian/Ubuntu, Fedora).
+AevumDB includes an advanced build and installation suite that automatically optimizes your environment.
 
 ```bash
 # Make all scripts executable
 chmod +x ./scripts/*.sh ./scripts/*/*.sh
 
-# Build AevumDB
-./scripts/build.sh
+# Full Lifecycle Installation (Recommended)
+# This will: Format -> Build -> Lint -> Test -> Install
+sudo ./scripts/install.sh
 ```
-
-The script will:
-1. Check for `cc`, `c++`, `rustc`, `cmake`, `ninja`, and `ccache`.
-2. If missing, it will attempt to install them using your system's package manager (`pacman`, `apt`, or `dnf`).
-3. Initialize git submodules.
-4. Configure the project using **Ninja** (if available) or **Make**.
-5. Build the project using all available CPU cores.
-
-Outputs to: `build/bin/aevumdb` and `build/bin/aevumsh`
 
 ## Prerequisites
 
-**Recommendation**: Use `./scripts/build.sh` as it handles these dependencies automatically for you.
+The build script (`./scripts/build.sh`) automatically detects and installs missing dependencies for you.
 
-### Ubuntu/Debian
+### Supported Distributions
+- **Arch Linux** (pacman)
+- **Ubuntu/Debian** (apt)
+- **Fedora/RHEL** (dnf)
 
-```bash
-sudo apt update
-sudo apt install -y build-essential cmake g++ git python3 pkg-config cargo ninja-build ccache
-```
-
-### Fedora/RHEL
-
-```bash
-sudo dnf install -y cmake gcc-c++ git python3 pkgconfig cargo ninja-build ccache
-```
-
-### Arch Linux
-
-```bash
-sudo pacman -S base-devel cmake git rust ninja ccache
-```
-
-## Build Process
-
-### Standard Build (Manual)
-
-If you prefer to build manually without the script:
-
-```bash
-# Create build directory
-mkdir -p build
-cd build
-
-# Configure with CMake (Ninja is highly recommended)
-cmake -G Ninja ..
-
-# Build
-ninja -j$(nproc)
-```
-
-If Ninja is not installed, fallback to Make:
-```bash
-cmake ..
-make -j$(nproc)
-```
+### Required Tools
+- **C++ Compiler**: GCC or Clang (C++17 support)
+- **Rust**: For the Query Execution Engine (FFI)
+- **CMake**: version 3.21+
+- **Ninja**: Highly recommended for build speed (default if available)
+- **ccache**: Recommended for near-instant rebuilds
 
 ## Optimization Features
 
-### Ninja Build System
-AevumDB now prioritizes the **Ninja** build system over GNU Make. Ninja is designed for speed and handles complex dependency graphs (like those in WiredTiger and mongo-c-driver) much faster than Make.
+### Persistent Vendor Strategy
+AevumDB now builds third-party libraries (WiredTiger, libbson) into a persistent `third_party/dist` directory. This means:
+- You can run `rm -rf build/` without losing pre-built libraries.
+- Subsequent environment setups are near-instant.
 
-### Compiler Cache (ccache)
-The build system automatically detects and utilizes **ccache** if installed. This significantly reduces time for subsequent builds by caching previously compiled object files.
+### Advanced C++ Compilation
+- **Unity Build**: Batches source files to reduce compiler overhead.
+- **Precompiled Headers (PCH)**: Pre-compiles heavy headers (STL, BSON, simdjson) only once.
+- **Core Library**: Consolidates logic into `aevum_core` to avoid double compilation.
 
-### Shared Core Library (aevum_core)
-To avoid redundant compilation, all common database logic is compiled once into a static library (`aevum_core`). This reduces the total build time by approximately 50% compared to earlier versions.
+## Build Process (Manual)
 
-Outputs:
-- `bin/aevumdb` - Database daemon server
-- `bin/aevumsh` - Interactive shell client
-
-### Build Script
-
-The provided build script handles everything:
+If you prefer to build manually without the installation script:
 
 ```bash
+# Standard optimized build using the orchestrator
 ./scripts/build.sh
+
+# Or clean and rebuild
+./scripts/build.sh rebuild
 ```
 
-**Options:**
+### Ninja Manual Build
 ```bash
-./scripts/build.sh clean      # Clean build artifacts
-./scripts/build.sh rebuild    # Clean + build
-./scripts/build.sh verbose    # Build with verbose output
-```
-
-## Build Modes
-
-### Debug Build (with symbols, no optimization)
-
-```bash
-mkdir -p build_debug
-cd build_debug
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make -j$(nproc)
-```
-
-Useful for:
-- Debugging with GDB/LLDB
-- Detailed error messages
-- Development/testing
-
-### Release Build (optimized, stripped)
-
-```bash
-mkdir -p build_release
-cd build_release
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j$(nproc)
-```
-
-Useful for:
-- Production deployment
-- Maximum performance
-- Minimal binary size
-
-### MinSizeRel (optimized, smallest)
-
-```bash
-mkdir -p build_minsize
-cd build_minsize
-cmake -DCMAKE_BUILD_TYPE=MinSizeRel ..
-make -j$(nproc)
-```
-
-## Components Built
-
-### Binaries
-
-1. **aevumdb**
-   - Main daemon server process
-   - Location: `build/bin/aevumdb`
-   - Listens on port 55001 by default
-
-2. **aevumsh**
-   - Interactive shell client
-   - Location: `build/bin/aevumsh`
-   - Connects to aevumdb daemon
-
-### Libraries (Internal)
-
-Built statically and linked into binaries:
-- **libbson** - BSON document serialization (from mongo-c-driver)
-- **simdjson** - Fast JSON parsing
-- **WiredTiger** - Embedded storage engine
-
-## Configuration
-
-### CMake Variables
-
-Override with: `cmake -D<VAR>=<VALUE> ..`
-
-**Common variables:**
-
-```bash
-# Build type
--DCMAKE_BUILD_TYPE=Release|Debug|MinSizeRel
-
-# Compiler version
--DCMAKE_CXX_STANDARD=17
-
-# Install prefix
--DCMAKE_INSTALL_PREFIX=/usr/local
-
-# Verbose output
--DCMAKE_VERBOSE_MAKEFILE=ON
-```
-
-**Example:**
-```bash
-mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/aevumdb ..
-make -j$(nproc)
-```
-
-## Parallel Compilation
-
-Use all CPU cores:
-
-```bash
-make -j$(nproc)
-```
-
-Or specific count:
-```bash
-make -j4
-```
-
-## Cleaning Build
-
-Remove build artifacts:
-
-```bash
-# Clean within build directory
-make clean
-
-# Full rebuild from scratch
-rm -rf build
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
-```
-
-## Build Verification
-
-After building, verify binaries exist:
-
-```bash
-ls -lh build/bin/aevumdb
-ls -lh build/bin/aevumsh
-```
-
-Quick functionality test:
-
-```bash
-# Create temp data directory
-mkdir -p /tmp/aevumdb_test
-
-# Start daemon
-./build/bin/aevumdb &
-DAEMON_PID=$!
-
-# Wait for startup
-sleep 2
-
-# Connect and test
-echo "db.test.insert({name: \"test\"})" | ./build/bin/aevumsh
-
-# Kill daemon
-kill $DAEMON_PID
-```
-
-## Code Formatting and Analysis
-
-Before committing code:
-
-```bash
-# Format all C++ code
-./scripts/format.sh cpp
-
-# Format all Rust code
-./scripts/format.sh rust
-
-# Format everything
-./scripts/format.sh
-```
-
-Run code analysis and linting:
-
-```bash
-# Analyze all C++ code
-./scripts/lint.sh
-
-# Fix issues automatically where possible
-./scripts/lint.sh --fix
-```
-
-Requirements:
-- **C++**: clang-format (installed via build-essential/development tools)
-- **C++ Analysis**: clang-tidy (installed via clang-tools)
-- **Rust**: rustfmt (installed with Rust toolchain)
-
-## Common Build Issues
-
-### Missing Dependencies (Compiler, Rust, CMake)
-
-The easiest fix is to let `scripts/build.sh` handle it for you:
-```bash
-./scripts/build.sh
-```
-It supports **Arch Linux (pacman)**, **Ubuntu/Debian (apt)**, and **Fedora (dnf)**.
-
-### CMake not found
-
-Ubuntu/Debian:
-```bash
-sudo apt install cmake
-```
-
-Fedora/RHEL:
-```bash
-sudo dnf install cmake
-```
-
-### C++ compiler missing
-
-Ubuntu/Debian:
-```bash
-sudo apt install build-essential
-```
-
-Fedora/RHEL:
-```bash
-sudo dnf install gcc-c++
-```
-
-### WiredTiger build fails
-
-Ubuntu/Debian:
-```bash
-sudo apt install python3 pkg-config
-```
-
-Fedora/RHEL:
-```bash
-sudo dnf install python3 pkgconfig
-```
-
-# Clean and rebuild
-rm -rf build
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
-```
-
-### Out of memory during build
-
-Limit parallel jobs:
-
-```bash
-make -j2
-```
-
-Or use system swap:
-
-```bash
-# Create 4GB swap file (Ubuntu)
-sudo fallocate -l 4G /swapfile
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
-```
-
-### Permission denied on install
-
-```bash
-# Use prefix to install to user directory
-mkdir -p ~/.local
-cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
-make -j$(nproc)
-make install
+mkdir -p build && cd build
+cmake -G Ninja ..
+ninja -j$(nproc)
 ```
 
 ## Installation
 
-### System-wide (requires sudo)
+### System-wide Deployment (/opt/aevumdb)
+This follows the professional database model (like MongoDB).
 
 ```bash
-cd build
-sudo make install
+sudo ./scripts/install.sh
 ```
 
-Default location: `/usr/local/bin/`
+**Results:**
+- **Binaries**: `/opt/aevumdb/bin/aevumdb`, `/opt/aevumdb/bin/aevumsh`
+- **Configuration**: `/etc/aevum/aevumdb.conf`
+- **Data/Logs**: `/opt/aevumdb/data`, `/opt/aevumdb/log`
+- **System Service**: `aevumdb.service` registered in systemd.
+- **Global Access**: `aevumdb` and `aevumsh` available in your PATH.
 
-### User directory (no sudo needed)
+## Build Modes
 
+### Debug Build
 ```bash
-mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
-make -j$(nproc)
-make install
+./scripts/build.sh debug  # (If supported by script)
+# Or manually:
+cmake -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
-Binaries at: `~/.local/bin/aevumdb` and `~/.local/bin/aevumsh`
-
-Add to PATH if needed:
+### Release Build (Default)
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
+./scripts/build.sh
+# Or manually:
+cmake -DCMAKE_BUILD_TYPE=Release ..
 ```
 
-### Custom location
+## Performance Tuning
 
-```bash
-cmake -DCMAKE_INSTALL_PREFIX=/opt/aevumdb ..
-make -j$(nproc)
-sudo make install
-```
-
-## Performance Optimization
-
-### Compiler Optimization Levels
-
-Release mode uses `-O3` by default for maximum performance.
-
-For maximum size optimization:
-```bash
-cmake -DCMAKE_BUILD_TYPE=MinSizeRel ..
-```
-
-### Link-Time Optimization (LTO)
-
-Enable if supported:
-```bash
-cmake -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=True ..
-```
-
-### CPU-Specific Features
-
-Enable SIMD optimizations:
+### Compiler Optimization
+Release mode uses `-O3` by default. To target your specific CPU architecture:
 ```bash
 cmake -DCMAKE_CXX_FLAGS="-march=native" ..
 ```
 
-## Cross-Compilation
-
-For other architectures/platforms:
-
+### Parallel Jobs
+By default, the build script uses all available CPU cores. To limit them:
 ```bash
-# Example: ARM64 on Linux x86_64
-cmake -DCMAKE_SYSTEM_NAME=Linux \
-      -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
-      -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
-      -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ ..
+./scripts/build.sh -j 4
 ```
 
-## Troubleshooting Build
+## Common Build Issues
 
-### Check CMake version
-```bash
-cmake --version
-```
-Must be 3.21 or newer.
+### stoi Exception on Startup
+If the daemon fails with `stoi`, ensure your `/etc/aevum/aevumdb.conf` contains a valid numerical port and that you are using the binary which supports the `--config` flag.
 
-### Check compiler version
-```bash
-g++ --version    # or clang++
-```
-Must support C++17.
-
-### Verbose error output
-```bash
-make VERBOSE=1
-```
-
-### Check compiler path
-```bash
-which gcc g++ clang clang++
-```
-
-### Debug CMake
-```bash
-cmake --debug-output ..
-```
+### Missing ccache or Ninja
+The build script will attempt to install them. If it fails, install them manually:
+- `sudo apt install ninja-build ccache`
+- `sudo dnf install ninja-build ccache`
+- `sudo pacman -S ninja ccache`
 
 ## See Also
-
-- [Getting Started](GETTING_STARTED.md) - Quick start guide
-- [Development](DEVELOPMENT.md) - Development setup
-- [Deployment](DEPLOYMENT.md) - Production deployment
-- [Scripts](SCRIPTS.md) - Build script documentation
-- [Troubleshooting](TROUBLESHOOTING.md) - Common issues
+- [Scripts Documentation](SCRIPTS.md)
+- [Deployment Guide](DEPLOYMENT.md)
+- [Architecture Overview](ARCHITECTURE.md)

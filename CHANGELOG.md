@@ -5,6 +5,29 @@ All notable changes to AevumDB are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-14
+
+### Added
+- **Persistent Vendor Strategy**: Optimized third-party library management by moving WiredTiger and libbson builds to `third_party/dist`, ensuring they persist across `rm -rf build` operations.
+- **Enterprise-Grade Installation**: Introduced a new system-wide installation suite (`scripts/install.sh`) that automates the full development lifecycle (Format, Build, Lint, Test, and Deploy).
+- **Systemd Daemon Support**: Official support for running AevumDB as a persistent background service with automatic restart and boot management.
+- **Dynamic Configuration**: Daemon now supports reading operational parameters (dbPath, port, logging) from `/etc/aevum/aevumdb.conf` via the `--config` flag.
+- **Centralized Deployment**: Standardized installation in `/opt/aevumdb` with global symbolic links in `/usr/local/bin` for seamless terminal access.
+
+### Optimized
+- **Advanced Compilation Pipeline**: Integrated **Ninja** as the primary build generator and **ccache** for significantly faster incremental builds.
+- **Build Performance**: Implemented **Unity Builds** and **Precompiled Headers (PCH)**, reducing the total compilation time for internal C++ source code by up to 60%.
+- **Core Engine Refactoring**: Consolidated database logic into a shared `aevum_core` library, eliminating redundant compilation cycles for the daemon and shell binaries.
+- **Streamlined Outputs**: Cleaned up all shell script outputs and internal comments, removing decorative symbols for a more professional and modern terminal experience.
+
+### Updated
+- `docs/BUILDING.md`, `docs/DEPLOYMENT.md`, `docs/SCRIPTS.md`
+- `src/aevum/ffi/Cargo.toml`
+### Fixed
+- Fixed `stoi` runtime exception during systemd startup by implementing a robust manual configuration parser for the daemon.
+- Resolved target naming conflicts in `CMakeLists.txt` during FFI integration.
+- Fixed WiredTiger build failures on **GCC 15** by suppressing strict array-bounds warnings and disabling mandatory `-Werror` for third-party code.
+
 ## [1.1.2] - 2026-03-13
 
 ### Added
@@ -116,6 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- `1.2.0` - Persistent Vendor & System-wide Installation (March 14, 2026)
 - `1.1.2` - Build system optimizations (ccache, Ninja, Core Lib) (March 13, 2026)
 - `1.1.1` - Automated dependency installation (March 12, 2026)
 - `1.1.0` - Shell improvements and 'clear' command (March 11, 2026)

@@ -20,11 +20,17 @@ AevumDB uses three major third-party libraries for core functionality. All are i
 - All persistent data in `data/` directory
 
 ### How it's built
-```bash
-# CMakeLists.txt configures and builds WiredTiger
-# ExternalProject_Add handles compilation
-# Linked statically as libwiredtiger.a
-```
+AevumDB uses a **Persistent Vendor Strategy** for heavy third-party libraries.
+
+1. **WiredTiger**: Built using `ExternalProject_Add` and installed into `third_party/dist`.
+2. **libbson**: Built as a subdirectory during the first run and installed into `third_party/dist`.
+
+**Benefits**:
+- **Persistence**: Results in `third_party/dist` are NOT deleted when you run `rm -rf build/`.
+- **Speed**: Subsequent builds skip recompiling these heavy libraries, saving several minutes of build time.
+
+### Configuration
+In `CMakeLists.txt`, these libraries are integrated as `IMPORTED` targets once they are found in the `dist` directory.
 
 ### Configuration
 In `CMakeLists.txt`~line 55-84:

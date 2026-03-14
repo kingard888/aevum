@@ -1,0 +1,39 @@
+[Unit]
+Description=AevumDB - High-Performance Distributed Document Database Engine
+Documentation=https://github.com/aevumdb/aevum
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+
+# Process Management
+ExecStart=/opt/aevumdb/bin/aevumdb --config /etc/aevum/aevumdb.conf
+KillMode=process
+KillSignal=SIGTERM
+TimeoutStopSec=30
+Restart=always
+RestartSec=10
+
+# Resource Limits
+LimitNOFILE=65536
+LimitNPROC=65536
+LimitMEMLOCK=infinity
+LimitCORE=infinity
+
+# Security & Sandboxing
+# Ensures the process cannot gain new privileges
+NoNewPrivileges=true
+# Gives the process its own private /tmp and /var/tmp
+PrivateTmp=true
+# Makes /usr, /boot, and /etc read-only for the process
+ProtectSystem=full
+# Prevents access to /home, /root, and /run/user
+ProtectHome=true
+# Prevents the process from creating its own kernel namespaces
+RestrictNamespaces=true
+
+[Install]
+WantedBy=multi-user.target

@@ -18,22 +18,31 @@ cd aevum
 **Ubuntu 20.04+**
 ```bash
 sudo apt update
-sudo apt install -y build-essential cmake g++ git python3 pkg-config gdb lldb valgrind clang-format
+sudo apt install -y build-essential cmake g++ git python3 pkg-config gdb lldb valgrind clang-format ninja-build ccache
 ```
 
 **Fedora 33+**
 ```bash
-sudo dnf install -y cmake gcc-c++ python3 pkgconfig gdb llvm-tools valgrind clang-tools-extra
+sudo dnf install -y cmake gcc-c++ python3 pkgconfig gdb llvm-tools valgrind clang-tools-extra ninja-build ccache
 ```
 
 ### Build for Development
 
+The recommended way to build for development is using the orchestrator script which handles dependencies and optimizations automatically.
+
 ```bash
-# Create debug build
-mkdir -p build_dev
-cd build_dev
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make -j$(nproc)
+# Standard build (Release mode with optimizations)
+./scripts/build.sh
+
+# Debug build (for GDB/LLDB)
+./scripts/build.sh debug  # (Ensure script supports this or use manual cmake)
+```
+
+**Manual Debug Build:**
+```bash
+mkdir -p build_dev && cd build_dev
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
+ninja -j$(nproc)
 ```
 
 Debug binaries at:

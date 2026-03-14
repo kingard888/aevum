@@ -13,6 +13,7 @@
  * sequence across all active subsystems.
  */
 #include <csignal>
+#include <fstream>
 #include <iostream>
 #include <pthread.h>
 #include <stdexcept>
@@ -28,6 +29,34 @@
  * @brief Logic and state management specific to the execution of the AevumDB background daemon.
  */
 namespace aevum::daemon {
+
+/**
+ * @brief A simple helper to parse basic key-value pairs from the config file.
+ */
+void parse_config(const std::string &config_path, std::string &data_path, int &port) {
+    std::ifstream config_file(config_path);
+    if (!config_file.is_open()) {
+        throw std::runtime_error("Could not open configuration file: " + config_path);
+    }
+
+    std::string line;
+    while (std::getline(config_file, line)) {
+        // Simple manual parsing for YAML-like keys
+        if (line.find("dbPath:") != std::string::npos) {
+            size_t pos = line.find("dbPath:") + 7;
+            data_path = line.substr(pos);
+            // Trim whitespace
+            data_path.erase(0, data_path.find_first_not_of(" \t"));
+            data_path.erase(data_path.find_last_not_of(" \t") + 1);
+        } else if (line.find("port:") != std::string::npos) {
+            size_t pos = line.find("port:") + 5;
+            std::string port_str = line.substr(pos);
+            port_str.erase(0, port_str.find_first_not_of(" \t"));
+            port_str.erase(port_str.find_last_not_of(" \t") + 1);
+            port = std::stoi(port_str);
+        }
+    }
+}
 
 /**
  * @brief A global pointer to the active server instance, utilized for signal-driven management.
@@ -70,17 +99,18 @@ void signal_wait_thread() {
 
 /**
  * @brief Emits the standardized command-line interface usage guide to the standard output stream.
- * @details This utility function provides clarity on the available configuration parameters for
- * the daemon, specifically the physical data storage path and the network port allocation.
- * @param binary_name The filename of the current executable as provided by the operating system.
  */
 void print_help(const char *binary_name) {
-    std::cout << "AevumDB Daemon - Command Line Interface Guide\n"
-              << "Usage: " << binary_name << " [DATA_PATH] [PORT]\n"
-              << "  DATA_PATH : (Optional) The filesystem directory allocated for database "
-                 "persistence. Defaults to './aevum_data'.\n"
-              << "  PORT      : (Optional) The TCP/IP port number for the network listener. "
-                 "Defaults to 55001.\n";
+    std::cout
+        << "AevumDB Daemon - High-Performance Distributed Document Database Engine\n\n"
+        << "Usage: " << binary_name << " [OPTIONS]\n\n"
+        << "Options:\n"
+        << "  --config <path> : Path to the YAML-based configuration file.\n"
+        << "  --help          : Display this technical reference guide.\n\n"
+        << "Positional Arguments (Legacy Mode):\n"
+        << "  [DATA_PATH]     : Filesystem directory for physical storage (Default: ./aevum_data)\n"
+        << "  [PORT]          : TCP/IP port for network communication (Default: 55001)\n\n"
+        << "Documentation: https://github.com/aevumdb/aevum\n";
 }
 
 }  // namespace aevum::daemon
@@ -128,16 +158,32 @@ int main(int argc, char *argv[]) {
 
     try {
         // Dynamically resolve configuration from command-line arguments.
-        if (argc > 1) data_path = argv[1];
-        if (argc > 2) port = std::stoi(argv[2]);
+        if (argc > 1) {
+            std::string arg1 = argv[1];
+            if (arg1 == "--config" && argc > 2) {
+                // If --config is used, parse the data path and port from the config file.
+                aevum::util::log::Logger::info("Daemon: Configuration provided via file: " +
+                                               std::string(argv[2]));
+                aevum::daemon::parse_config(argv[2], data_path, port);
+            } else {
+                // Otherwise, treat arguments as positional: [DATA_PATH] [PORT]
+                data_path = arg1;
+                if (argc > 2) port = std::stoi(argv[2]);
+            }
+        }
 
-        aevum::util::log::Logger::info("Daemon: Commencing AevumDB daemon bootstrap sequence...");
+        aevum::util::log::Logger::info(
+            "Daemon: Initiating AevumDB high-performance bootstrap sequence...");
 
         // Initialize the central database orchestration engine.
         aevum::db::Core database_instance(data_path);
+        aevum::util::log::Logger::info("Core: Storage engine initialized with data path: " +
+                                       data_path);
 
         // Configure the high-performance network server subsystem.
         aevum::net::server::Server network_server(database_instance, port);
+        aevum::util::log::Logger::info("Network: Listening for incoming connections on port " +
+                                       std::to_string(port));
 
         // Register the server instance with the global signal manager.
         aevum::daemon::g_server_instance = &network_server;

@@ -3,6 +3,7 @@
 
 # Build system artifacts and CMake-generated files
 /build/
+/third_party/dist/
 CMakeCache.txt
 CMakeFiles/
 Makefile

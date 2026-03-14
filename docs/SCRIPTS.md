@@ -1,533 +1,178 @@
 # Scripts Documentation
 
-AevumDB includes utility scripts for building, formatting code, and development tasks. All scripts are located in the `/scripts/` directory.
+AevumDB includes a comprehensive script suite for the full development lifecycle: formatting, building, analysis, testing, and deployment.
 
 ## Quick Reference
 
 ```bash
+# Full Installation (Recommended)
+# Automatically runs: Format -> Build -> Lint -> Test -> Install
+sudo ./scripts/install.sh
+
 # Build the project (default: Release mode)
 ./scripts/build.sh
 
 # Clean and rebuild
 ./scripts/build.sh rebuild
 
-# Format C++ code
-./scripts/format.sh cpp
+# Format C++ and Rust code
+./scripts/format.sh
 
-# Format Rust code
-./scripts/format.sh rust
-
-# Run FFI tests
-./scripts/test.sh
-
-# Run code analysis and linting
+# Run code analysis (clang-tidy)
 ./scripts/lint.sh
 
+# Run FFI tests (cargo test)
+./scripts/test.sh
+
 # Show help
-./scripts/build.sh --help
+./scripts/build.sh help
 ```
+
+## Installation Scripts
+
+### scripts/install.sh
+
+Main installation orchestrator. This script is designed for centralized system deployment and ensures the codebase is in perfect condition before installation.
+
+**Location**: `/scripts/install.sh`
+
+**Usage**:
+```bash
+sudo ./scripts/install.sh
+```
+
+**What it does**:
+1. Redirects to the implementation in `scripts/install/install.sh`.
+2. Initiates the **Full Lifecycle Check**:
+   - **Step 1**: Formats code using `format.sh`.
+   - **Step 2**: Builds the project using `build.sh` (required for linting).
+   - **Step 3**: Lints code using `lint.sh` to ensure quality.
+   - **Step 4**: Runs Rust FFI tests using `test.sh`.
+   - **Step 5**: Deploys AevumDB to `/opt/aevumdb/` and registers the systemd service.
+
+### scripts/install/install.sh
+
+Core installation implementation. Handles file system organization and service registration.
+
+**Location**: `/scripts/install/install.sh`
+
+**Standard Install Paths**:
+- **Binaries**: `/opt/aevumdb/bin/`
+- **Data**: `/opt/aevumdb/data/`
+- **Logs**: `/opt/aevumdb/log/`
+- **Configuration**: `/etc/aevum/aevumdb.conf`
+- **Global Commands**: `/usr/local/bin/` (symlinks)
+- **System Service**: `aevumdb.service`
 
 ## Build Scripts
 
 ### scripts/build.sh
 
-Main build orchestrator script. Handles CMake configuration, compilation, and output organization.
+Main build orchestrator. Optimized for performance using Ninja, ccache, and persistent vendor caching.
 
 **Location**: `/scripts/build.sh`
 
-**Usage**:
-```bash
-./scripts/build.sh [COMMAND] [OPTIONS]
-```
-
 **Commands**:
-- `(default)` - Build with CMake
-- `clean` - Remove build artifacts
-- `rebuild` - Clean + build
-- `verbose` - Build with verbose output
-- `help` - Show this message
-
-**Options**:
-- `-j N` - Build with `N` parallel jobs (e.g., `-j 4`)
+- `(default)`: Configure and build the project.
+- `clean`: Remove build artifacts.
+- `rebuild`: Clean and then build fresh.
+- `verbose`: Show detailed compiler output.
 
 **What it does**:
-1. Creates `build/` directory if not present
-2. Checks for and installs required build tools (**Ninja**, **ccache**, **CMake**, etc.)
-3. Runs `cmake` with the **Ninja** generator if available
-4. Executes the build with parallel jobs (auto-detected)
-5. Outputs binaries to `build/bin/`
-
-**Example**:
-```bash
-# Standard optimized build
-./scripts/build.sh
-
-# Build with 4 parallel jobs
-./scripts/build.sh -j 4
-```
-
-### scripts/build/build.sh
-
-Core build logic with advanced performance detection.
-
-**Location**: `/scripts/build/build.sh`
-
-**What it does**:
-- Detects and installs missing dependencies (`cc`, `c++`, `rustc`, `cmake`, `ninja`, `ccache`).
-- Automatically prioritizes the **Ninja** build system for faster performance.
-- Enables **ccache** globally to accelerate project and dependency rebuilds.
-- Orchestrates the compilation of the Rust FFI module and its integration into the C++ project.
-- Verifies and organizes build artifacts.
-
-**Configuration**:
-- `CMAKE_BUILD_TYPE`: Release (optimized) or Debug
-- Parallel jobs: Auto-detected (`$(nproc)`)
-- Output: `build/bin/aevumdb` and `build/bin/aevumsh`
-
-**Usually called automatically** - Use `./scripts/build.sh` instead.
+1. Detects and installs missing build tools (Ninja, ccache, CMake).
+2. Automatically prioritizes the **Ninja** build system.
+3. Utilizes **ccache** to accelerate recompilation.
+4. Manages the persistent vendor directory (`third_party/dist`).
 
 ## Formatting Scripts
 
 ### scripts/format.sh
 
-Code formatting orchestrator. Formats C++, Rust, or all code.
-
-**Location**: `/scripts/format.sh`
+Code formatting orchestrator for both C++ and Rust.
 
 **Usage**:
 ```bash
-./scripts/format.sh [LANGUAGE]
+./scripts/format.sh [cpp|rust]
 ```
 
-**Languages**:
-- `cpp` - Format C++ code only (clang-format)
-- `rust` - Format Rust code only (rustfmt)
-- `(default)` - Format both C++ and Rust
+- **cpp**: Uses `clang-format` on all `.cpp` and `.hpp` files.
+- **rust**: Uses `rustfmt` on all `.rs` files in the FFI module.
 
-**What it does**:
-1. Finds all source files (`*.cpp`, `*.hpp`, `*.rs`)
-2. Applies language-specific formatter
-3. Modifies files in-place
-4. Reports changes
-
-**Example**:
-```bash
-# Format everything
-./scripts/format.sh
-
-# Format only C++
-./scripts/format.sh cpp
-
-# Format only Rust
-./scripts/format.sh rust
-```
-
-### scripts/format/format.sh
-
-Formatting orchestrator (called by `scripts/format.sh`).
-
-**Location**: `/scripts/format/format.sh`
-
-**Dispatches to**:
-- `scripts/format/format-cpp.sh` - C++ formatting
-- `scripts/format/format-rust.sh` - Rust formatting
-
-### scripts/format/format-cpp.sh
-
-C++ code formatting using `clang-format`.
-
-**Location**: `/scripts/format/format-cpp.sh`
-
-**What it does**:
-1. Finds all `.cpp` and `.hpp` files in `src/`
-2. Applies clang-format with configured style
-3. Configuration from `.clang-format`
-
-**Configuration**:
-- Style file: `.clang-format` (project root)
-- Format: LLVM-based with customizations
-- Indent: 4 spaces
-- Line length: ~100 characters
-
-**Requirements**:
-```bash
-# Ubuntu/Debian
-sudo apt install clang-format
-
-# Fedora/RHEL
-sudo dnf install clang-tools-extra
-```
-
-**Usage**:
-```bash
-./scripts/format/format-cpp.sh
-```
-
-### scripts/format/format-rust.sh
-
-Rust code formatting using `rustfmt`.
-
-**Location**: `/scripts/format/format-rust.sh`
-
-**What it does**:
-1. Finds all `.rs` files in `src/aevum/ffi/src/`
-2. Applies rustfmt with project configuration
-3. Configuration from `src/aevum/ffi/rustfmt.toml`
-
-**Configuration**:
-- Configuration file: `src/aevum/ffi/rustfmt.toml`
-- Follow Rust edition conventions
-- Automatic formatting per Rust standards
-
-**Requirements**:
-```bash
-# rustfmt comes with Rust toolchain
-# Install Rust if not present
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# Update rustfmt
-rustup update
-```
-
-**Usage**:
-```bash
-./scripts/format/format-rust.sh
-```
-
-## Test Scripts
-
-### scripts/test.sh
-
-Test orchestrator script. Runs cargo tests for the FFI module in AevumDB.
-
-**Location**: `/scripts/test.sh`
-
-**Usage**:
-```bash
-./scripts/test.sh [OPTIONS]
-```
-
-**What it does**:
-1. Navigates to the `src/aevum/ffi` directory
-2. Executes `cargo test` with specified options
-3. Provides comprehensive test coverage for the Foreign Function Interface
-4. Reports test results
-
-**Options** (pass to cargo):
-- `(default)` - Run all tests
-- `-- --test-name` - Run specific test
-- `-- --nocapture` - Run tests with output visible
-- `-- --single-threaded` - Run tests sequentially
-
-**Example**:
-```bash
-# Run all tests
-./scripts/test.sh
-
-# Run specific test with output
-./scripts/test.sh -- test_name --nocapture
-
-# Run tests sequentially
-./scripts/test.sh -- --single-threaded
-```
-
-### scripts/test/test.sh
-
-Core test logic. Called by `scripts/test.sh`.
-
-**Location**: `/scripts/test/test.sh`
-
-**What it does**:
-1. Validates FFI directory exists
-2. Checks for `Cargo.toml` in the FFI directory
-3. Executes `cargo test` with passed arguments
-4. Reports completion status
-
-**Requirements**:
-- Rust toolchain installed
-- `Cargo.toml` present in `src/aevum/ffi/`
-
-**Usually called automatically** - Use `./scripts/test.sh` instead.
-
-## Lint Scripts
+## Linting Scripts
 
 ### scripts/lint.sh
 
-Lint orchestrator script. Runs clang-tidy static analysis and code quality checks on AevumDB.
-
-**Location**: `/scripts/lint.sh`
+Static analysis orchestrator using `clang-tidy`.
 
 **Usage**:
 ```bash
-./scripts/lint.sh [TARGET] [OPTIONS]
+./scripts/lint.sh [TARGET] [--fix]
 ```
 
 **What it does**:
-1. Validates build artifacts exist (compile_commands.json)
-2. Checks for clang-tidy installation
-3. Runs clang-tidy analysis on C++ source code
-4. Reports potential bugs, style issues, and modernization opportunities
-5. Supports auto-fixing where applicable
+- Analyzes C++ code for bugs, style issues, and modern standards.
+- Requires `compile_commands.json` generated during the build process.
 
-**Targets**:
-- `(default)` - Analyze all C++ files in `src/aevum/`
-- `src/aevum/db/` - Analyze specific directory
-- `src/aevum/main.cpp` - Analyze specific file
+## Testing Scripts
 
-**Options**:
-- `--fix` - Automatically fix issues where possible
-- `--checks=CHECK_NAME` - Run specific checks only
+### scripts/test.sh
 
-**Requirements**:
-- Project must be built first: `./scripts/build.sh`
-- clang-tools installed (includes clang-tidy)
+FFI test orchestrator for the Query Execution Engine.
 
-**Example**:
+**Usage**:
 ```bash
-# Run all checks
-./scripts/lint.sh
-
-# Check specific directory
-./scripts/lint.sh src/aevum/db/
-
-# Check specific file
-./scripts/lint.sh src/aevum/main.cpp
-
-# Auto-fix issues
-./scripts/lint.sh --fix
-
-# Run specific checks
-./scripts/lint.sh --checks=modernize-*
+./scripts/test.sh [CARGO_ARGS]
 ```
 
-### scripts/lint/lint.sh
-
-Core lint logic. Called by `scripts/lint.sh`.
-
-**Location**: `/scripts/lint/lint.sh`
-
 **What it does**:
-1. Verifies `compile_commands.json` exists from build
-2. Checks if clang-tidy is available
-3. Parses command-line arguments and targets
-4. Executes clang-tidy with appropriate checks
-5. Reports analysis results
-
-**Requirements**:
-- Build directory with `compile_commands.json`
-- clang-tidy executable in PATH
-- `.clang-tidy` configuration file in project root
-
-**Usually called automatically** - Use `./scripts/lint.sh` instead.
+- Executes `cargo test` in the `src/aevum/ffi` directory.
+- Verifies the integrity of the C++/Rust interface.
 
 ## Directory Structure
 
 ```
 scripts/
-├── build.sh                 # Main build script (user-facing)
-├── format.sh                # Main format script (user-facing)
-├── test.sh                  # Main test script (user-facing)
-├── lint.sh                  # Main lint script (user-facing)
+├── build.sh                 # Build orchestrator
+├── install.sh               # Install orchestrator
+├── format.sh                # Format orchestrator
+├── lint.sh                  # Lint orchestrator
+├── test.sh                  # Test orchestrator
 │
 ├── build/
-│   └── build.sh            # Build implementation
-│
+│   └── build.sh            # Build core logic
+├── install/
+│   ├── install.sh          # Install core logic
+│   └── aevumdb.service     # Systemd definition
 ├── format/
-│   ├── format.sh           # Format orchestrator
-│   ├── format-cpp.sh       # C++ formatting
-│   └── format-rust.sh      # Rust formatting
-│
-├── test/
-│   └── test.sh             # Test implementation
-│
-└── lint/
-    └── lint.sh             # Lint/analysis implementation
-```
-
-## Common Tasks
-
-### Build for Development
-
-```bash
-# Debug build with symbols
-mkdir -p build_dev
-cd build_dev
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make -j$(nproc)
-```
-
-### Build for Production
-
-```bash
-# Optimized release build
-./scripts/build.sh rebuild
-# Creates: build/bin/aevumdb (optimized)
-```
-
-### Format Before Commit
-
-```bash
-# Format all code
-./scripts/format.sh
-
-# Or just C++
-./scripts/format.sh cpp
-
-# Lint all C++ code
-./scripts/lint.sh
-
-# Then commit
-git add .
-git commit -m "style: format and lint code"
-```
-
-### Clean Rebuild
-
-```bash
-./scripts/build.sh rebuild
-# Removes old build/ and starts fresh
-```
-
-### Build in Verbose Mode
-
-```bash
-./scripts/build.sh verbose
-# Shows each compiler command
-# Useful for debugging build issues
-```
-
-## Environment Variables
-
-These can affect script behavior:
-
-```bash
-# Number of parallel make jobs
-export MAKEFLAGS="-j4"
-
-# CMake build type (Release/Debug/RelWithDebInfo/MinSizeRel)
-# Usually set in scripts, but can override:
-export CMAKE_BUILD_TYPE=Debug
-
-# Compiler
-export CC=gcc
-export CXX=g++
-# or: clang, clang++, etc.
+│   ├── format-cpp.sh       # C++ format implementation
+│   └── format-rust.sh      # Rust format implementation
+├── lint/
+│   └── lint.sh             # Lint implementation
+└── test/
+    └── test.sh             # Test implementation
 ```
 
 ## Troubleshooting
 
-### Missing Dependencies (Compiler, Rust, CMake)
-
-The easiest fix is to let `scripts/build.sh` handle it for you:
+### Script Permission Denied
+Ensure all scripts are executable:
 ```bash
-./scripts/build.sh
-```
-It supports **Arch Linux (pacman)**, **Ubuntu/Debian (apt)**, and **Fedora (dnf)**.
-
-### Build fails: "CMake not found"
-
-```bash
-# Install CMake
-sudo apt install cmake
+chmod +x scripts/*.sh scripts/*/*.sh
 ```
 
-### Format fails: "clang-format not found"
-
-Ubuntu/Debian:
+### Build fails with ccache error
+Ensure ccache is installed or clear its cache:
 ```bash
-sudo apt install clang-format
+ccache -C
 ```
 
-Fedora/RHEL:
+### Installation fails (No sudo)
+The installation script requires root privileges to write to `/opt` and `/etc`:
 ```bash
-sudo dnf install clang-tools-extra
-```
-
-### Format fails: "rustfmt not found"
-
-```bash
-# rustfmt comes with Rust
-# Install/update Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-rustup update
-```
-
-### Build slow with parallel jobs
-
-```bash
-# Reduce parallel jobs
-make -j2    # Instead of make -j$(nproc)
-
-# Or set environment variable
-export MAKEFLAGS="-j2"
-./scripts/build.sh
-```
-
-### Permission denied on script
-
-```bash
-# Make all scripts executable
-chmod +x ./scripts/build.sh
-chmod +x ./scripts/format.sh
-chmod +x ./scripts/test.sh
-chmod +x ./scripts/lint.sh
-chmod -R +x ./scripts/build/
-chmod -R +x ./scripts/format/
-chmod -R +x ./scripts/test/
-chmod -R +x ./scripts/lint/
-
-# Or with one command after clone
-cd aevum
-chmod +x ./scripts/*.sh ./scripts/*/*.sh
-```
-
-## Git Integration
-
-### Pre-commit Hook
-
-Format code automatically before commit:
-
-**`.git/hooks/pre-commit`**:
-```bash
-#!/bin/bash
-./scripts/format.sh cpp
-git add src/
-```
-
-Make executable:
-```bash
-chmod +x .git/hooks/pre-commit
-```
-
-## Advanced: Customizing Scripts
-
-### Change Build Directory
-
-Edit `scripts/build/build.sh`:
-```bash
-# Find line: BUILD_DIR="build"
-# Change to: BUILD_DIR="custom_build"
-```
-
-### Use Different Compiler
-
-```bash
-export CC=clang
-export CXX=clang++
-./scripts/build.sh
-```
-
-### Change Output Location
-
-```bash
-mkdir -p /opt/aevumdb
-cd /opt/aevumdb
-cmake /path/to/aevumdb
-make -j$(nproc)
+sudo ./scripts/install.sh
 ```
 
 ## See Also
-
-- [Building](BUILDING.md) - Detailed build instructions
-- [Development](DEVELOPMENT.md) - Development workflow
-- [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - Directory layout
+- [Building AevumDB](BUILDING.md)
+- [Deployment Guide](DEPLOYMENT.md)
+- [Project Structure](PROJECT_STRUCTURE.md)

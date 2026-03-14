@@ -38,11 +38,11 @@ Welcome to AevumDB - a document database designed for simplicity and performance
 ## Quick Command Examples
 
 ```bash
-# Start the server
-./build/bin/aevumdb
+# Start the server (if installed system-wide)
+aevumdb
 
 # In another terminal, connect
-./build/bin/aevumsh
+aevumsh
 
 # Try these commands
 > db.users.insert({name: "Alice", age: 30})
@@ -154,4 +154,4 @@ Quick links to solutions:
 
 ---
 
-Last updated: 2026-03-11
+Last updated: 2026-03-14

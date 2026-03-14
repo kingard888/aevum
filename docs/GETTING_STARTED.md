@@ -4,14 +4,16 @@ Get AevumDB running in 5 minutes and start using it immediately!
 
 ## Prerequisites
 
-- **Linux** (Ubuntu 20.04+, Fedora 33+, or other Linux distributions)
+- **Linux** (Ubuntu 20.04+, Fedora 33+, Arch Linux, or other distributions)
 - **Git**
 
-**Note**: The AevumDB build script (`./scripts/build.sh`) automatically detects and installs missing compilers, Rust, and CMake for you on Arch, Debian/Ubuntu, and Fedora.
+**Note**: AevumDB automatically detects and installs missing dependencies like compilers, Rust, CMake, Ninja, and ccache during the build process.
 
 ## Installation
 
-### 1. Clone and Build (2 minutes)
+### 1. Clone and Install (2 minutes)
+
+The recommended way to install AevumDB is using the automated installation script, which handles formatting, building, linting, testing, and system-wide deployment.
 
 ```bash
 # Clone the repository
@@ -21,36 +23,33 @@ cd aevum
 # Make scripts executable
 chmod +x ./scripts/*.sh ./scripts/*/*.sh
 
-# Build AevumDB
-./scripts/build.sh
+# Full system-wide installation
+sudo ./scripts/install.sh
 ```
 
-Binaries will be at:
-- `build/bin/aevumdb` - Database server
-- `build/bin/aevumsh` - Interactive shell
+This installs AevumDB to `/opt/aevumdb` and makes `aevumdb` and `aevumsh` available globally.
 
 ### 2. Start the Server (30 seconds)
 
-In one terminal:
+Since AevumDB is installed as a system service, you can manage it using `systemctl`:
 
 ```bash
 # Start the daemon
-./build/bin/aevumdb
+sudo systemctl start aevumdb
 ```
 
-You should see:
-```
-[INFO] Initializing AevumDB core with data directory: './data'
-[INFO] Starting AevumDB server on 127.0.0.1:55001
+To verify it is running:
+```bash
+systemctl status aevumdb
 ```
 
 ### 3. Connect with Shell (1 minute)
 
-In another terminal:
+You can now connect to the database from any directory:
 
 ```bash
 # Connect to the database
-./build/bin/aevumsh
+aevumsh
 ```
 
 You should see:
@@ -132,18 +131,17 @@ lsof -ti:55001 | xargs kill -9
 ### Build fails
 ```bash
 # Clean and rebuild
-rm -rf build
-mkdir build && cd build
-cmake .. && make
+./scripts/build.sh clean
+./scripts/build.sh
 ```
 
 ### Shell won't connect
 ```bash
-# Check if server is running
-ps aux | grep aevumdb
+# Check if service is running
+systemctl status aevumdb
 
-# Start server if needed
-./build/bin/aevumdb
+# Start service if needed
+sudo systemctl start aevumdb
 ```
 
 ## Common Commands
