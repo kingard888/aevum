@@ -39,9 +39,9 @@ Welcome to AevumDB - a document database designed for simplicity and performance
 
 ```bash
 # Start the server (if installed system-wide)
-aevumdb
+sudo systemctl start aevumdb
 
-# In another terminal, connect
+# Connect with the shell
 aevumsh
 
 # Try these commands

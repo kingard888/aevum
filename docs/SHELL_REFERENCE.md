@@ -284,8 +284,25 @@ Display the command reference in the shell.
 
 ```bash
 > help
-AevumDB Interactive Shell - Command Reference
-...
+
+Shell Commands:
+  help                          Display this help message
+  clear                         Clear the terminal screen
+  exit | quit                   Exit the AevumDB shell
+
+Data Operations:
+  db.<coll>.find(<query>)       Find documents matching the query
+  db.<coll>.insert(<doc>)       Insert a new document into the collection
+  db.<coll>.update(<q>, <u>)    Update documents matching the query
+  db.<coll>.delete(<query>)     Delete documents matching the query
+  db.<coll>.count(<query>)      Count documents matching the query
+
+Administrative:
+  db.<coll>.set_schema(<json>)  Set validation schema for a collection
+  db.create_user(u, r)          Create a database user with a role
+                                Roles: ADMIN, READ_WRITE, READ_ONLY
+
+Documentation: https://github.com/aevumdb/aevum
 ```
 
 ### clear

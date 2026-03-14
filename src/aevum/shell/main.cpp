@@ -41,10 +41,13 @@ int main(int argc, char *argv[]) {
 
     // Provide a helpful usage message if requested via command-line flags.
     if (argc > 1 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h")) {
-        std::cout << "Usage: " << argv[0] << " [host] [port] [api_key]\n"
-                  << "  host    : Optional. AevumDB daemon hostname or IP (default: 127.0.0.1).\n"
-                  << "  port    : Optional. Port number of the daemon (default: 55001).\n"
-                  << "  api_key : Optional. API key for authentication (default: 'root').\n";
+        std::cout << "AevumDB Shell Client\n\n"
+                  << "Usage: " << argv[0] << " [host] [port] [api_key]\n\n"
+                  << "Arguments:\n"
+                  << "  host    : AevumDB daemon hostname or IP (default: 127.0.0.1)\n"
+                  << "  port    : Port number of the daemon (default: 55001)\n"
+                  << "  api_key : API key for authentication (default: 'root')\n\n"
+                  << "Documentation: https://github.com/aevumdb/aevum\n";
         return 0;
     }
 

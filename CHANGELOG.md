@@ -5,6 +5,14 @@ All notable changes to AevumDB are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-03-14
+
+### Updated
+- `src/aevum/shell/repl/repl.cpp` - Refactored `print_help` to use a clean, professional style similar to `mongosh`.
+- `src/aevum/shell/main.cpp` - Improved CLI usage message for the shell client.
+- `docs/SHELL_REFERENCE.md`, `docs/GETTING_STARTED.md`, `docs/README.md` - Synchronized all user documentation with the new v1.2.1 shell output standards and system commands.
+- `CMakeLists.txt`, `src/aevum/ffi/Cargo.toml` - Bumped version to 1.2.1.
+
 ## [1.2.0] - 2026-03-14
 
 ### Added
@@ -139,6 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- `1.2.1` - Shell help improvements and standardization (March 14, 2026)
 - `1.2.0` - Persistent Vendor & System-wide Installation (March 14, 2026)
 - `1.1.2` - Build system optimizations (ccache, Ninja, Core Lib) (March 13, 2026)
 - `1.1.1` - Automated dependency installation (March 12, 2026)

@@ -54,8 +54,8 @@ aevumsh
 
 You should see:
 ```
-Connected to AevumDB at 127.0.0.1:55001
-Type 'help' for command reference.
+Connecting to AevumDB at 127.0.0.1:55001...
+Connection successful. Type 'help' for a list of commands.
 > 
 ```
 

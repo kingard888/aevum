@@ -29,26 +29,21 @@ namespace aevum::shell::repl {
  */
 void print_help() {
     std::cout
-        << "AevumDB Interactive Shell - Command Reference\n"
-        << "--------------------------------------------------------------------------------\n"
-        << "General Syntax: db.<collection>.<operation>(<arguments>)\n\n"
-        << "Available Data Operations:\n"
-        << "  db.<coll>.insert({ <document_json> })           - Ingests a new document.\n"
-        << "  db.<coll>.find({ <query> }, { <sort> }, <limit>, <skip>)\n"
-        << "                                                  - Queries and retrieves data.\n"
-        << "  db.<coll>.update({ <query> }, { <update> })     - Modifies matching documents.\n"
-        << "  db.<coll>.count({ <query> })                    - Returns document count.\n"
-        << "  db.<coll>.delete({ <query> })                   - Erases matching documents.\n\n"
-        << "Administrative & Schema Operations:\n"
-        << "  db.<coll>.set_schema({ <schema_json> })         - Defines validation rules.\n"
-        << "  db.create_user(\"<key>\", \"<role>\")               - Registers a new user account.\n"
-        << "                                                    Roles: READ_ONLY, READ_WRITE, "
-           "ADMIN\n\n"
-        << "Shell Built-in Commands:\n"
-        << "  help                                            - Displays this manual.\n"
-        << "  clear                                           - Clears the terminal screen.\n"
-        << "  exit | quit                                     - Terminates the session.\n"
-        << "--------------------------------------------------------------------------------\n";
+        << "\nShell Commands:\n"
+        << "  help                          Display this help message\n"
+        << "  clear                         Clear the terminal screen\n"
+        << "  exit | quit                   Exit the AevumDB shell\n\n"
+        << "Data Operations:\n"
+        << "  db.<coll>.find(<query>)       Find documents matching the query\n"
+        << "  db.<coll>.insert(<doc>)       Insert a new document into the collection\n"
+        << "  db.<coll>.update(<q>, <u>)    Update documents matching the query\n"
+        << "  db.<coll>.delete(<query>)     Delete documents matching the query\n"
+        << "  db.<coll>.count(<query>)      Count documents matching the query\n\n"
+        << "Administrative:\n"
+        << "  db.<coll>.set_schema(<json>)  Set validation schema for a collection\n"
+        << "  db.create_user(u, r)          Create a database user with a role\n"
+        << "                                Roles: ADMIN, READ_WRITE, READ_ONLY\n\n"
+        << "Documentation: https://github.com/aevumdb/aevum\n\n";
 }
 
 /**
